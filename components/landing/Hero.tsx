@@ -5,7 +5,7 @@ export default function Hero() {
   return (
     <section className="bg-green-50">
       <div className="mx-auto max-w-7xl px-base pt-xl md:px-xl md:pt-2xl">
-        <div className="relative h-[clamp(420px,55vw,600px)] overflow-hidden rounded-lg">
+        <div className="relative h-[clamp(420px,55vw,600px)] overflow-hidden rounded-3xl">
           <Image
             src="/hero-bg.jpg"
             alt="Hospital corridor"
@@ -44,7 +44,7 @@ export default function Hero() {
                   Find Facilities Nearby
                 </Link>
                 <Link
-                  href="#emergency"
+                  href="/emergency"
                   className="inline-flex min-h-[48px] items-center justify-center rounded-full border border-white/40 px-xl text-center font-body text-body-md font-semibold text-text-inverse transition-colors hover:bg-white/10"
                 >
                   Emergency Help Request

@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { Menu, X } from "lucide-react";
 import Logo from "../shared/Logo";
 
 const NAV_LINKS = [
-  { label: "Emergency", href: "#emergency" },
-  { label: "Facilities", href: "#facilities" },
-  { label: "Get Care", href: "#get-care" },
+  { label: "Emergency", href: "/emergency" },
+  { label: "Facilities", href: "/facilities" },
+  { label: "Get Care", href: "/get-care" },
 ];
 
 export default function Navbar() {
@@ -56,25 +57,7 @@ export default function Navbar() {
           aria-expanded={open}
           className="inline-flex h-[44px] w-[44px] items-center justify-center rounded-md text-green-900 md:hidden"
         >
-          {open ? (
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M6 6L18 18M6 18L18 6"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            </svg>
-          ) : (
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M4 7H20M4 12H20M4 17H20"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            </svg>
-          )}
+          {open ? <X size={22} /> : <Menu size={22} />}
         </button>
       </nav>
 
