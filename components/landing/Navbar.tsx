@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Logo from "../shared/Logo";
 
 const NAV_LINKS = [
   { label: "Emergency", href: "#emergency" },
@@ -15,30 +16,7 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-200">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-base py-sm md:px-xl md:py-md">
-        {/* Logo */}
-        <Link
-          href="/"
-          className="flex items-center gap-xs"
-          onClick={() => setOpen(false)}
-        >
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            className="text-green-700"
-          >
-            <path
-              d="M12 2L22 20H2L12 2Z"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinejoin="round"
-            />
-          </svg>
-          <span className="font-display text-heading-md font-semibold text-green-900">
-            ReferNet
-          </span>
-        </Link>
+        <Logo />
 
         {/* Desktop links */}
         <ul className="hidden items-center gap-xl md:flex">

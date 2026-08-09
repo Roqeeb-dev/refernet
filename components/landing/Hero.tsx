@@ -1,24 +1,28 @@
+import Image from "next/image";
 import Link from "next/link";
 
 export default function Hero() {
   return (
     <section className="bg-green-50">
       <div className="mx-auto max-w-7xl px-base pt-xl md:px-xl md:pt-2xl">
-        <div className="relative min-h-[440px] overflow-hidden rounded-lg sm:min-h-[500px] md:min-h-[600px]">
-          <img
+        <div className="relative h-[clamp(420px,55vw,600px)] overflow-hidden rounded-lg">
+          <Image
             src="/hero-bg.jpg"
             alt="Hospital corridor"
-            className="absolute inset-0 h-full w-full object-cover"
+            fill
+            priority
+            sizes="(min-width: 1280px) 1200px, 100vw"
+            className="object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-green-900/95 via-green-900/55 to-green-900/10" />
 
           <div className="absolute inset-0 flex flex-col justify-end p-lg sm:p-xl md:p-3xl">
-            <div className="w-full max-w-[280px] sm:max-w-sm md:max-w-lg lg:max-w-xl">
+            <div className="max-w-[85%] sm:max-w-[60vw] md:max-w-[45vw] lg:max-w-[38vw]">
               <p className="mb-sm font-body text-overline uppercase text-green-100">
                 Referral Network
               </p>
 
-              <h1 className="mb-base font-display text-3xl font-bold leading-[1.1] text-text-inverse sm:text-4xl md:text-5xl lg:text-display-xl">
+              <h1 className="mb-base font-display font-bold leading-[1.1] text-text-inverse text-[clamp(1.75rem,5vw,2.5rem)]">
                 Find the Right Care. Faster.
               </h1>
 
@@ -32,7 +36,7 @@ export default function Hero() {
                 </span>
               </div>
 
-              <div className="flex flex-col gap-sm xs:flex-row sm:flex-wrap sm:gap-base">
+              <div className="flex flex-wrap gap-sm sm:gap-base">
                 <Link
                   href="#facilities"
                   className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-green-500 px-xl text-center font-body text-body-md font-semibold text-text-inverse transition-colors hover:bg-green-700"
