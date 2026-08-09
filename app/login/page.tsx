@@ -29,59 +29,80 @@ export default function LoginPage() {
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-green-900 px-base py-2xl sm:px-xl">
       <Image src="/hero-bg.jpg" alt="" fill priority className="object-cover" />
-      <div className="absolute inset-0 bg-green-900/70" />
+      <div className="absolute inset-0 bg-green-900/35" />
 
-      {/* Back to home */}
-      <Link
-        href="/"
-        aria-label="Back to home"
-        className="absolute left-lg top-lg z-10 inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-text-inverse backdrop-blur transition-colors hover:bg-white/20 sm:left-xl sm:top-xl"
-      >
-        <ArrowLeft />
-      </Link>
+      {/* Login card — frosted glass over the background image */}
+      <div className="relative z-10 w-full max-w-[420px] rounded-xl border border-white/20 bg-white/5 p-xl shadow-floating backdrop-blur-2xl sm:p-2xl">
+        <Link
+          href="/"
+          aria-label="Back to home"
+          className="mb-base inline-flex h-8 w-8 items-center justify-center text-text-inverse transition-opacity hover:opacity-70"
+        >
+          <ArrowLeft size={20} />
+        </Link>
 
-      {/* Login card */}
-      <div className="relative z-10 w-full max-w-[400px] rounded-lg bg-white/95 p-xl shadow-floating backdrop-blur sm:p-2xl">
-        <p className="mb-lg text-center font-display text-heading-lg font-bold text-green-900">
-          ReferNet NG
-        </p>
+        <div className="mb-xl text-center">
+          <p className="font-display text-heading-xl font-bold text-green-900">
+            ReferNet NG
+          </p>
+          <div className="mx-auto mt-xs h-px w-10 bg-green-900/40" />
+        </div>
 
         <div className="mb-lg text-center">
-          <h1 className="mb-xs font-display text-heading-xl font-bold text-green-900">
+          <h1 className="mb-xs font-display text-heading-xl font-bold text-text-inverse">
             Welcome Back
           </h1>
-          <p className="font-body text-body-sm text-text-secondary">
+          <p className="font-body text-body-sm text-white/80">
             Log in to your facility dashboard
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-base">
-          <Input
-            label="Email address"
-            type="email"
-            placeholder="you@hospital.org"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            autoComplete="email"
-            required
-          />
-          <Input
-            label="Password"
-            type="password"
-            placeholder="••••••••"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoComplete="current-password"
-            required
-          />
+          <div className="flex flex-col gap-xs">
+            <label
+              htmlFor="email"
+              className="font-body text-body-sm font-semibold text-text-inverse"
+            >
+              Email address
+            </label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="you@hospital.org"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+              required
+              className="bg-white"
+            />
+          </div>
+
+          <div className="flex flex-col gap-xs">
+            <label
+              htmlFor="password"
+              className="font-body text-body-sm font-semibold text-text-inverse"
+            >
+              Password
+            </label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
+              required
+              className="bg-white"
+            />
+          </div>
 
           <div className="flex items-center justify-between">
-            <label className="flex items-center gap-xs font-body text-body-sm text-text-secondary">
+            <label className="flex items-center gap-xs font-body text-body-sm text-text-inverse">
               <input
                 type="checkbox"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
-                className="h-4 w-4 rounded border-gray-200 text-green-700 focus:ring-green-500"
+                className="h-4 w-4 rounded border-white/40 bg-transparent text-green-700 focus:ring-green-500"
               />
               Remember me
             </label>
@@ -109,11 +130,11 @@ export default function LoginPage() {
           </Button>
         </form>
 
-        <p className="mt-lg text-center font-body text-body-sm text-text-secondary">
+        <p className="mt-lg text-center font-body text-body-sm text-white/80">
           Don&apos;t have an account?{" "}
           <Link
             href="/register"
-            className="font-semibold text-green-700 hover:underline"
+            className="font-semibold text-green-800 hover:underline"
           >
             Create one here
           </Link>
