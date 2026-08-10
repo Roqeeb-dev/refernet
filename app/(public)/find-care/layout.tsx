@@ -42,23 +42,25 @@ export default function FindCareLayout({
         </h1>
       </div>
 
-      <div className="flex gap-xs bg-white p-sm">
-        {TABS.map((tab) => {
-          const active = pathname.startsWith(tab.href);
-          return (
-            <Link
-              key={tab.href}
-              href={tab.href}
-              className={`flex-1 rounded-full py-sm text-center font-body text-body-sm font-semibold transition-colors ${
-                active
-                  ? tab.activeClass
-                  : "bg-gray-100 text-text-secondary hover:bg-gray-200"
-              }`}
-            >
-              {tab.label}
-            </Link>
-          );
-        })}
+      <div className="bg-white px-base py-sm">
+        <div className="flex rounded-md bg-gray-100">
+          {TABS.map((tab) => {
+            const active = pathname.startsWith(tab.href);
+            return (
+              <Link
+                key={tab.href}
+                href={tab.href}
+                className={`flex-1 rounded-md py-sm text-center font-body text-body-sm font-semibold transition-colors ${
+                  active
+                    ? tab.activeClass
+                    : "text-text-secondary hover:text-text-primary"
+                }`}
+              >
+                {tab.label}
+              </Link>
+            );
+          })}
+        </div>
       </div>
 
       <main className="flex flex-1 flex-col bg-green-50">{children}</main>

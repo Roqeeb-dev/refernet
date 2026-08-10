@@ -33,15 +33,15 @@ export default function EmergencyPage() {
 
   return (
     <FindCareBackdrop>
-      <div className="rounded-lg bg-green-900/80 p-xl text-center shadow-floating backdrop-blur-md sm:p-2xl">
-        <div className="mx-auto mb-lg flex h-14 w-14 items-center justify-center rounded-full bg-white/15">
+      <div className="rounded-xl border border-white/20 bg-white/10 p-xl text-center shadow-floating backdrop-blur-2xl p-2xl">
+        <div className="mx-auto mb-lg flex h-14 w-14 items-center justify-center rounded-full border border-white/20 bg-white/10">
           <MapPin size={24} className="text-white" />
         </div>
 
-        <h2 className="mb-sm font-display text-heading-lg font-bold text-white">
+        <h2 className="mb-sm font-display text-heading-xl font-bold text-white">
           Find Emergency Care Near You
         </h2>
-        <p className="mb-lg font-body text-body-sm text-green-100">
+        <p className="mb-lg font-body text-body-sm text-white/80">
           We need your location to show nearby facilities.
           <br />
           Your location is only used to find nearby hospitals and never stored.
@@ -65,9 +65,15 @@ export default function EmergencyPage() {
           Allow Location Access
         </Button>
 
+        <div className="mt-base flex items-center gap-sm">
+          <span className="h-px flex-1 bg-white/20" />
+          <span className="font-body text-caption text-white/50">or</span>
+          <span className="h-px flex-1 bg-white/20" />
+        </div>
+
         <button
           type="button"
-          className="mt-base font-body text-body-sm text-green-100 underline underline-offset-2 transition-colors hover:text-white"
+          className="mt-xs font-body text-body-sm text-white/90 underline underline-offset-2 transition-colors hover:text-white"
         >
           Enter Location Manually
         </button>
