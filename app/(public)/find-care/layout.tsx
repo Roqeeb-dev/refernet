@@ -1,4 +1,5 @@
-import Image from "next/image";
+"use client";
+
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
@@ -60,18 +61,7 @@ export default function FindCareLayout({
         })}
       </div>
 
-      <div className="relative flex flex-1 items-center justify-center overflow-hidden p-base sm:p-xl">
-        <Image
-          src="/hero-bg.jpg"
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover"
-        />
-        <div className="absolute inset-0 bg-green-900/20" />
-        <div className="relative z-10 w-full max-w-[380px]">{children}</div>
-      </div>
+      <main className="flex flex-1 flex-col bg-green-50">{children}</main>
     </div>
   );
 }

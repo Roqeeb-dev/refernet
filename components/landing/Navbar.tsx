@@ -7,15 +7,14 @@ import { Menu, X } from "lucide-react";
 import Logo from "../shared/Logo";
 
 const NAV_LINKS = [
-  { label: "Emergency", href: "/emergency" },
+  { label: "Emergency", href: "/find-care/emergency" },
   { label: "Facilities", href: "/facilities" },
-  { label: "Get Care", href: "/get-care" },
+  { label: "Get Care", href: "/find-care/guided-care" },
 ];
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
 
-  // Lock background scroll while the drawer is open, and let Escape close it.
   useEffect(() => {
     if (!open) return;
 
