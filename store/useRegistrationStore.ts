@@ -59,6 +59,7 @@ interface RegistrationState {
   setLocation: (data: Partial<LocationDetails>) => void;
   setCapacity: (data: Partial<CapacityDetails>) => void;
   setServices: (data: Partial<ServicesDetails>) => void;
+  toggleService: (service: string) => void;
   setDocuments: (data: Partial<DocumentsDetails>) => void;
   completeStep: (step: number) => void;
   reset: () => void;
@@ -98,6 +99,15 @@ export const useRegistrationStore = create<RegistrationState>()(
           services: { ...state.services, ...data },
         })),
 
+      toggleService: (service) =>
+        set((state) => {
+          const current = state.services.services ?? [];
+          const next = current.includes(service)
+            ? current.filter((s) => s !== service)
+            : [...current, service];
+          return { services: { ...state.services, services: next } };
+        }),
+
       setDocuments: (data) =>
         set((state) => ({
           documents: { ...state.documents, ...data },
@@ -120,6 +130,7 @@ export const useRegistrationStore = create<RegistrationState>()(
           setLocation,
           setCapacity,
           setServices,
+          toggleService,
           setDocuments,
           completeStep,
           reset,
