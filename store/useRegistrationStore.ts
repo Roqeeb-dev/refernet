@@ -3,9 +3,21 @@ import { createJSONStorage, persist } from "zustand/middleware";
 
 export interface BasicDetails {
   facilityName?: string;
-  facilityType?: string;
-  email?: string;
-  phone?: string;
+  facilityType?: string; // e.g. "PHC" | "General Hospital" | "Specialist Hospital" | "Tertiary Hospital"
+  registrationNumber?: string; // MOD/MDCN registration number
+
+  // Contact details
+  officialEmail?: string;
+  phoneNumber?: string;
+  website?: string; // optional
+
+  // Primary contact person
+  contactName?: string;
+  contactRole?: string;
+  contactPhone?: string;
+  contactEmail?: string;
+  password?: string;
+  confirmPassword?: string;
 }
 
 export interface LocationDetails {
@@ -102,6 +114,26 @@ export const useRegistrationStore = create<RegistrationState>()(
       name: "refernet-registration",
       storage: createJSONStorage(() => sessionStorage),
       skipHydration: true,
+      partialize: (state) => {
+        const {
+          setBasicDetails,
+          setLocation,
+          setCapacity,
+          setServices,
+          setDocuments,
+          completeStep,
+          reset,
+          ...data
+        } = state;
+        return {
+          ...data,
+          basicDetails: {
+            ...data.basicDetails,
+            password: undefined,
+            confirmPassword: undefined,
+          },
+        };
+      },
     },
   ),
 );

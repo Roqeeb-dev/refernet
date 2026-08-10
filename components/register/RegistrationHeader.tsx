@@ -21,9 +21,9 @@ export default function RegistrationHeader() {
     ((currentStep - 1) / (TOTAL_REGISTRATION_STEPS - 1)) * 100;
 
   return (
-    <div className="border-b border-gray-200 bg-white">
+    <div className="sticky top-0 border-b border-gray-200 bg-white">
       {/* Title row */}
-      <div className="mx-auto flex max-w-5xl items-center justify-between px-base py-sm md:px-xl">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-base py-sm md:px-xl">
         <div className="flex items-center gap-sm">
           <Logo />
           <span className="font-body text-body-sm text-text-secondary">
@@ -36,11 +36,9 @@ export default function RegistrationHeader() {
       </div>
 
       {/* Step tracker */}
-      <div className="mx-auto max-w-5xl px-base pb-base md:px-xl">
+      <div className="mx-auto max-w-7xl px-base pb-base md:px-xl">
         <div className="relative">
-          {/* Background line */}
           <div className="absolute left-0 right-0 top-3 h-px bg-gray-200" />
-          {/* Completed portion of the line */}
           <div
             className="absolute left-0 top-3 h-px bg-green-500 transition-all duration-300"
             style={{ width: `${progressPercent}%` }}

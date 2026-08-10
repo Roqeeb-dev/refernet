@@ -1,7 +1,6 @@
-export default function RegisterPage() {
-  return (
-    <main>
-      <h1>This is the register page</h1>
-    </main>
-  );
+import { redirect } from "next/navigation";
+import { REGISTRATION_STEPS } from "@/lib/registrationSteps";
+
+export default function RegisterIndexPage() {
+  redirect(REGISTRATION_STEPS[0].path);
 }

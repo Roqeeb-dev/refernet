@@ -10,7 +10,7 @@ export default function RegisterLayout({
     <div className="min-h-screen bg-gray-50">
       <RegistrationHydration />
       <RegistrationHeader />
-      <main className="mx-auto max-w-3xl px-base py-2xl md:px-xl">
+      <main className="mx-auto max-w-6xl px-base py-2xl md:px-xl">
         {children}
       </main>
     </div>
