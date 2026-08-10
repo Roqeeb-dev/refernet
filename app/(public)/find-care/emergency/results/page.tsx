@@ -3,7 +3,9 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Search } from "lucide-react";
-import FacilityCard, { type Facility } from "../FacilityCard";
+import FacilityCard, {
+  type Facility,
+} from "@/components/emergency/FacilityCard";
 
 const MOCK_FACILITIES: Facility[] = [
   {

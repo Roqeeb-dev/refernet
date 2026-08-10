@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { MapPin } from "lucide-react";
 import Button from "@/components/shared/Button";
-import FindCareBackdrop from "./FindCareBackdrop";
+import FindCareBackdrop from "@/components/emergency/FindCareBackdrop";
 
 export default function EmergencyPage() {
   const router = useRouter();
@@ -20,8 +20,6 @@ export default function EmergencyPage() {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         setLocating(false);
-        // TODO: build /find-care/emergency/results — the nearby-facilities
-        // list this should land on.
         router.push(
           `/find-care/emergency/results?lat=${position.coords.latitude}&lng=${position.coords.longitude}`,
         );

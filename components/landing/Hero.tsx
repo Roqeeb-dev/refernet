@@ -5,7 +5,7 @@ export default function Hero() {
   return (
     <section className="bg-green-50">
       <div className="mx-auto max-w-7xl px-base pt-xl md:px-xl md:pt-2xl">
-        <div className="relative h-[clamp(420px,55vw,600px)] overflow-hidden rounded-3xl">
+        <div className="relative h-[clamp(400px,55vw,500px)] overflow-hidden rounded-3xl">
           <Image
             src="/hero-bg.jpg"
             alt="Hospital corridor"

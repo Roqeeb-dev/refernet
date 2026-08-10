@@ -54,14 +54,14 @@ export default function FacilityShowcase() {
             tile.span === "big" ? (
               <div
                 key={tile.key}
-                className="relative min-h-[240px] overflow-hidden rounded-lg sm:row-span-2 sm:min-h-0"
+                className="group relative min-h-[240px] overflow-hidden rounded-lg sm:row-span-2 sm:min-h-0"
               >
                 <Image
                   src={tile.image}
                   alt={tile.title}
                   fill
                   sizes="(min-width: 640px) 33vw, 100vw"
-                  className="object-cover"
+                  className="object-cover transition-transform duration-500 ease-out group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-green-900/90 via-green-900/20 to-transparent" />
                 <div className="absolute inset-x-0 bottom-0 p-lg">
@@ -76,14 +76,14 @@ export default function FacilityShowcase() {
             ) : (
               <div
                 key={tile.key}
-                className="relative min-h-[140px] overflow-hidden rounded-lg sm:min-h-0"
+                className="group relative min-h-[140px] overflow-hidden rounded-lg sm:min-h-0"
               >
                 <Image
                   src={tile.image}
                   alt={tile.title}
                   fill
                   sizes="(min-width: 640px) 33vw, 100vw"
-                  className="object-cover"
+                  className="object-cover transition-transform duration-500 ease-out group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-green-900/85 via-green-900/10 to-transparent" />
                 <div className="absolute inset-x-0 bottom-0 p-base">
