@@ -67,7 +67,7 @@ export default function AboutPage() {
           <h2 className="mb-xs text-center font-display text-heading-lg font-bold text-green-900">
             The problem isn&apos;t missing paperwork
           </h2>
-          <p className="mx-auto mb-xl max-w-xl text-center font-body text-body-md text-text-secondary">
+          <p className="mx-auto mb-xl max-w-6xl text-center font-body text-body-md text-text-secondary">
             Discovery research with 16 healthcare providers across 11 Nigerian
             states surfaced a coordination gap, not a documentation gap.
           </p>
@@ -91,7 +91,7 @@ export default function AboutPage() {
 
       {/* What we do */}
       <section className="bg-gray-50 px-base py-2xl sm:px-xl">
-        <div className="mx-auto max-w-4xl">
+        <div className="mx-auto max-w-6xl">
           <h2 className="mb-xl text-center font-display text-heading-lg font-bold text-green-900">
             What ReferNet does
           </h2>
@@ -115,7 +115,7 @@ export default function AboutPage() {
 
       {/* Our position */}
       <section className="px-base py-2xl sm:px-xl">
-        <div className="mx-auto max-w-2xl text-center">
+        <div className="mx-auto max-w-6xl text-center">
           <h2 className="mb-base font-display text-heading-lg font-bold text-green-900">
             Navigation support, not a replacement for clinical judgment
           </h2>
