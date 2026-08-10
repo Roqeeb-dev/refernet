@@ -22,7 +22,7 @@ const FOOTER_COLUMNS = [
   {
     heading: "Company",
     links: [
-      { label: "About Us", href: "/about-us" },
+      { label: "About Us", href: "/about" },
       { label: "Contact", href: "/contact" },
       { label: "Privacy Policy", href: "/privacy-policy" },
       { label: "Terms of Service", href: "/terms" },
