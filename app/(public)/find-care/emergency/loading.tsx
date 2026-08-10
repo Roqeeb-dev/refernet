@@ -18,7 +18,7 @@ function SkeletonCard() {
 
 export default function EmergencyResultsLoading() {
   return (
-    <div className="mx-auto w-full max-w-2xl px-base py-xl sm:px-xl">
+    <div className="mx-auto w-full max-w-[400px] px-base py-xl sm:px-xl">
       <div className="rounded-lg border border-gray-100 bg-white p-xl text-center">
         <Loader2
           size={20}

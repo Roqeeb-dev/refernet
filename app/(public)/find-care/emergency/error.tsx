@@ -12,7 +12,7 @@ export default function EmergencyResultsError({
   reset: () => void;
 }) {
   return (
-    <div className="mx-auto flex w-full max-w-sm flex-1 items-center justify-center px-base py-xl sm:px-xl">
+    <div className="mx-auto flex w-full max-w-[400px] flex-1 items-center justify-center px-xl py-xl">
       <div className="w-full rounded-lg border border-gray-100 bg-white p-xl text-center">
         <div className="mx-auto mb-lg flex h-14 w-14 items-center justify-center rounded-full bg-emergency-light">
           <MapPinOff size={24} className="text-emergency" />
