@@ -8,15 +8,6 @@ export interface AuthResponse {
 }
 
 export const authService = {
-  async signUp(email: string, password: string): Promise<AuthResponse> {
-    const { data, error } = await supabase.auth.signUp({ email, password });
-    return {
-      user: data?.user ?? null,
-      session: data?.session ?? null,
-      error: error?.message ?? null,
-    };
-  },
-
   async signIn(email: string, password: string): Promise<AuthResponse> {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
