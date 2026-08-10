@@ -7,6 +7,7 @@ import Input from "@/components/shared/Input";
 import Button from "@/components/shared/Button";
 import { useRegistrationStore } from "@/store/useRegistrationStore";
 import { REGISTRATION_STEPS } from "@/lib/registrationSteps";
+import { authService } from "@/services/auth.service";
 
 const FACILITY_TYPES = [
   "Primary Health Centre",
@@ -35,8 +36,9 @@ export default function BasicDetailsPage() {
   const { basicDetails, setBasicDetails, completeStep } =
     useRegistrationStore();
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  function handleContinue() {
+  async function handleContinue() {
     if (
       !basicDetails.facilityName ||
       !basicDetails.facilityType ||
@@ -60,6 +62,20 @@ export default function BasicDetailsPage() {
     }
 
     setError("");
+    setSubmitting(true);
+
+    const { error: signUpError } = await authService.signUp(
+      basicDetails.officialEmail,
+      basicDetails.password,
+    );
+
+    setSubmitting(false);
+
+    if (signUpError) {
+      setError(signUpError);
+      return;
+    }
+
     completeStep(1);
     router.push(REGISTRATION_STEPS[1].path); // -> Location
   }
@@ -248,10 +264,16 @@ export default function BasicDetailsPage() {
             variant="outline"
             type="button"
             onClick={() => router.push("/")}
+            disabled={submitting}
           >
             Cancel
           </Button>
-          <Button variant="primary" type="button" onClick={handleContinue}>
+          <Button
+            variant="primary"
+            type="button"
+            onClick={handleContinue}
+            isLoading={submitting}
+          >
             Continue
           </Button>
         </div>

@@ -33,8 +33,19 @@ export async function uploadFacilityDocument(
     return { path: null, error: validationError };
   }
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return {
+      path: null,
+      error: "You must be signed in to upload documents.",
+    };
+  }
+
   const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
-  const path = `${folder}/${crypto.randomUUID()}-${safeName}`;
+  const path = `${folder}/${user.id}/${crypto.randomUUID()}-${safeName}`;
 
   const { error } = await supabase.storage.from(BUCKET).upload(path, file, {
     cacheControl: "3600",
@@ -53,7 +64,7 @@ export async function deleteFacilityDocument(path: string): Promise<void> {
   await supabase.storage.from(BUCKET).remove([path]);
 }
 
-/** Short-lived signed URL for viewing a document */
+/** Short-lived signed URL for actually viewing a document */
 export async function getSignedDocumentUrl(
   path: string,
   expiresInSeconds = 60 * 5,

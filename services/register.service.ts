@@ -24,10 +24,20 @@ export async function submitFacilityRegistration(
 ): Promise<SubmitRegistrationResult> {
   const { basicDetails, location, capacity, services, documents } = data;
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "You must be signed in to submit a registration." };
+  }
+
   const { password, confirmPassword, ...basicDetailsWithoutPassword } =
     basicDetails;
 
   const { error } = await supabase.from("facility_registrations").insert({
+    owner_id: user.id,
+
     facility_name: basicDetailsWithoutPassword.facilityName,
     facility_type: basicDetailsWithoutPassword.facilityType,
     registration_number: basicDetailsWithoutPassword.registrationNumber,
