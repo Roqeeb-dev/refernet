@@ -5,9 +5,9 @@ const FOOTER_COLUMNS = [
   {
     heading: "Platform",
     links: [
-      { label: "Find Care", href: "#" },
-      { label: "Emergency Mode", href: "#" },
-      { label: "Guided Care", href: "#" },
+      { label: "Find Care", href: "/find-care/emergency" },
+      { label: "Emergency Mode", href: "/find-care/emergency" },
+      { label: "Guided Care", href: "/find-care/guided-care" },
       { label: "Referral Portal", href: "#" },
     ],
   },
@@ -22,10 +22,10 @@ const FOOTER_COLUMNS = [
   {
     heading: "Company",
     links: [
-      { label: "About Us", href: "#" },
-      { label: "Contact", href: "#" },
-      { label: "Privacy Policy", href: "#" },
-      { label: "Terms of Service", href: "#" },
+      { label: "About Us", href: "/about-us" },
+      { label: "Contact", href: "/contact" },
+      { label: "Privacy Policy", href: "/privacy-policy" },
+      { label: "Terms of Service", href: "/terms" },
     ],
   },
 ];

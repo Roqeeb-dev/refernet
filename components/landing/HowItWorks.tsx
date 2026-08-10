@@ -36,8 +36,8 @@ export default function HowItWorks() {
             </h2>
           </div>
           <p className="font-body text-body-md text-text-secondary md:text-right">
-            From location to confirmed care in under two minutes — built for
-            real emergencies and everyday needs.
+            From location to confirmed care in under two minutes <br /> built
+            for real emergencies and everyday needs.
           </p>
         </div>
 
