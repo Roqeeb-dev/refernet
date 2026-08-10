@@ -5,7 +5,7 @@ export default function CtaBanner() {
   return (
     <section className="bg-green-50">
       <div className="mx-auto max-w-7xl px-base pb-2xl md:px-xl md:pb-3xl">
-        <div className="relative h-[300px] overflow-hidden rounded-lg sm:h-[340px] md:h-[380px]">
+        <div className="relative h-[300px] overflow-hidden rounded-3xl sm:h-[340px] md:h-[380px]">
           <Image
             src="/hero-bg.jpg"
             alt="Hospital ward"
