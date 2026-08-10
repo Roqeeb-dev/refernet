@@ -1,30 +1,31 @@
+import Image from "next/image";
 import Link from "next/link";
 
 const TILES = [
   {
     key: "teaching-hospital",
-    image: "/images/facility-teaching-hospital.jpg",
+    image: "/lasuth-image.jpg",
     eyebrow: "Teaching Hospital",
     title: "Lagos University Teaching Hospital",
     span: "big",
   },
   {
     key: "ae",
-    image: "/images/facility-ae.jpg",
+    image: "/ae-image.jpg",
     eyebrow: "Emergency",
     title: "A&E Department",
     span: "small",
   },
   {
     key: "specialist",
-    image: "/images/facility-specialist.jpg",
+    image: "/specialist-image.jpg",
     eyebrow: "Specialist Clinic",
     title: "Specialist Consultation",
     span: "small",
   },
   {
     key: "maternity",
-    image: "/images/facility-maternity.jpg",
+    image: "/maternity-image.jpg",
     eyebrow: "Maternity",
     title: "Maternity & Mother Care",
     span: "small",
@@ -55,10 +56,12 @@ export default function FacilityShowcase() {
                 key={tile.key}
                 className="relative min-h-[240px] overflow-hidden rounded-lg sm:row-span-2 sm:min-h-0"
               >
-                <img
+                <Image
                   src={tile.image}
                   alt={tile.title}
-                  className="absolute inset-0 h-full w-full object-cover"
+                  fill
+                  sizes="(min-width: 640px) 33vw, 100vw"
+                  className="object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-green-900/90 via-green-900/20 to-transparent" />
                 <div className="absolute inset-x-0 bottom-0 p-lg">
@@ -75,10 +78,12 @@ export default function FacilityShowcase() {
                 key={tile.key}
                 className="relative min-h-[140px] overflow-hidden rounded-lg sm:min-h-0"
               >
-                <img
+                <Image
                   src={tile.image}
                   alt={tile.title}
-                  className="absolute inset-0 h-full w-full object-cover"
+                  fill
+                  sizes="(min-width: 640px) 33vw, 100vw"
+                  className="object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-green-900/85 via-green-900/10 to-transparent" />
                 <div className="absolute inset-x-0 bottom-0 p-base">

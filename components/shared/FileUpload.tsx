@@ -39,6 +39,7 @@ export default function FileUpload({
     setStatus("uploading");
     setFileName(file.name);
 
+    // Clean up the previous file for this slot, if replacing one.
     if (value) {
       await deleteFacilityDocument(value);
     }
@@ -93,7 +94,7 @@ export default function FileUpload({
           const file = e.dataTransfer.files?.[0];
           if (file) handleFile(file);
         }}
-        className={`flex min-h-[96px] cursor-pointer flex-col items-center justify-center gap-xs rounded-md border border-dashed px-base py-lg text-center transition-colors ${
+        className={`flex min-h-[140px] cursor-pointer flex-col items-center justify-center gap-sm rounded-md border border-dashed px-base py-2xl text-center transition-colors ${
           status === "error"
             ? "border-emergency bg-emergency-light"
             : status === "success"
@@ -116,18 +117,18 @@ export default function FileUpload({
 
         {status === "uploading" && (
           <>
-            <Loader2 size={20} className="animate-spin text-green-700" />
-            <p className="font-body text-body-sm text-text-secondary">
+            <Loader2 size={28} className="animate-spin text-green-700" />
+            <p className="font-body text-body-md text-text-secondary">
               Uploading {fileName}…
             </p>
           </>
         )}
 
         {status === "success" && (
-          <div className="flex w-full items-center justify-between gap-sm">
+          <div className="flex w-full items-center justify-between gap-sm px-sm">
             <div className="flex items-center gap-sm">
-              <FileCheck2 size={18} className="shrink-0 text-green-700" />
-              <span className="truncate font-body text-body-sm text-text-primary">
+              <FileCheck2 size={22} className="shrink-0 text-green-700" />
+              <span className="truncate font-body text-body-md text-text-primary">
                 {fileName}
               </span>
             </div>
@@ -144,11 +145,11 @@ export default function FileUpload({
 
         {(status === "idle" || status === "error") && (
           <>
-            <UploadCloud size={20} className="text-text-secondary" />
-            <p className="font-body text-body-sm text-text-primary">
+            <UploadCloud size={28} className="text-text-secondary" />
+            <p className="font-body text-body-md text-text-primary">
               Click to browse or drag &amp; drop
             </p>
-            <p className="font-body text-caption text-text-secondary">
+            <p className="font-body text-body-sm text-text-secondary">
               PDF, JPG, PNG — max 10MB
             </p>
           </>
