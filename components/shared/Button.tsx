@@ -1,6 +1,6 @@
 "use client";
 
-import { ButtonHTMLAttributes, forwardRef } from "react";
+import { ButtonHTMLAttributes, CSSProperties, forwardRef } from "react";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -14,9 +14,14 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   isLoading?: boolean;
 }
 
+const variantTextStyle: Partial<Record<ButtonVariant, CSSProperties>> = {
+  primary: { color: "#ffffff" },
+  danger: { color: "#ffffff" },
+};
+
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    "bg-green-700 hover:bg-green-900 hover:text-white focus-visible:ring-green-500 disabled:bg-green-100 disabled:text-text-disabled text-white",
+    "bg-green-700 hover:bg-green-900 focus-visible:ring-green-500 disabled:bg-green-100 disabled:text-text-disabled",
   secondary:
     "bg-green-50 text-green-900 hover:bg-green-100 focus-visible:ring-green-500 disabled:bg-gray-50 disabled:text-text-disabled",
   outline:
@@ -24,7 +29,7 @@ const variantStyles: Record<ButtonVariant, string> = {
   ghost:
     "bg-transparent text-green-700 hover:bg-green-50 focus-visible:ring-green-500 disabled:text-text-disabled",
   danger:
-    "bg-emergency text-white hover:opacity-90 focus-visible:ring-emergency disabled:bg-emergency-light disabled:text-text-disabled",
+    "bg-emergency hover:opacity-90 focus-visible:ring-emergency disabled:bg-emergency-light disabled:text-text-disabled",
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
@@ -42,6 +47,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       isLoading = false,
       disabled,
       className,
+      style,
       children,
       ...props
     },
@@ -51,6 +57,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       <button
         ref={ref}
         disabled={disabled || isLoading}
+        style={{ ...variantTextStyle[variant], ...style }}
         className={cn(
           "inline-flex items-center justify-center gap-xs rounded-md font-body font-semibold",
           "transition-colors duration-150",
