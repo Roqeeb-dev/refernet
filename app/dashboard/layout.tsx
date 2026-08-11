@@ -6,11 +6,11 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   // TODO: replace with the authenticated facility's real data
-  // (facility name, live status, and last-updated timestamp)
+  // (facility name, live status value, and last-updated timestamp)
   return (
     <DashboardShell
       facilityName="Lagos University Teaching Hospital"
-      statusLabel="Accepting Referrals"
+      status="accepting"
       lastUpdated="13:08"
     >
       {children}

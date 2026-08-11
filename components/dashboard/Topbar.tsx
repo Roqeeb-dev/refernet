@@ -1,28 +1,45 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { Bell, Menu, User } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import {
+  getFacilityStatusOption,
+  type FacilityStatusValue,
+} from "@/lib/facilityStatus";
+import UpdateFacilityStatusModal from "./UpdateFacilityStatusModal";
 
 interface TopbarProps {
   facilityName: string;
-  statusLabel: string;
+  status: FacilityStatusValue;
   lastUpdated: string;
   onMenuClick: () => void;
-  onEditStatus?: () => void;
+  onStatusChange?: (status: FacilityStatusValue) => void;
   hasNotifications?: boolean;
 }
 
 export default function Topbar({
   facilityName,
-  statusLabel,
+  status,
   lastUpdated,
   onMenuClick,
-  onEditStatus,
+  onStatusChange,
   hasNotifications = true,
 }: TopbarProps) {
   const { user, loading } = useAuth();
   const initials = user?.email ? user.email.charAt(0).toUpperCase() : null;
+
+  const [currentStatus, setCurrentStatus] =
+    useState<FacilityStatusValue>(status);
+  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+
+  const statusOption = getFacilityStatusOption(currentStatus);
+
+  function handleSaveStatus(newStatus: FacilityStatusValue) {
+    setCurrentStatus(newStatus);
+    onStatusChange?.(newStatus);
+  }
 
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between border-b border-gray-200 bg-white px-base py-sm md:px-xl">
@@ -48,15 +65,19 @@ export default function Topbar({
       </div>
 
       <div className="flex shrink-0 items-center gap-sm">
-        <div className="hidden items-center gap-xs rounded-full bg-green-50 px-base py-xs sm:flex">
-          <span className="h-2 w-2 rounded-full bg-green-500" />
-          <span className="whitespace-nowrap font-body text-body-sm font-medium text-green-700">
-            {statusLabel}
+        <div
+          className={`hidden items-center gap-xs rounded-full px-base py-xs sm:flex ${statusOption.bgColor}`}
+        >
+          <span className={`h-2 w-2 rounded-full ${statusOption.dotColor}`} />
+          <span
+            className={`whitespace-nowrap font-body text-body-sm font-medium ${statusOption.textColor}`}
+          >
+            {statusOption.label}
           </span>
           <button
             type="button"
-            onClick={onEditStatus}
-            className="ml-xs font-body text-caption font-semibold text-green-700 underline underline-offset-2 transition-colors hover:text-green-900"
+            onClick={() => setIsStatusModalOpen(true)}
+            className={`ml-xs font-body text-caption font-semibold underline underline-offset-2 transition-colors hover:opacity-80 ${statusOption.textColor}`}
           >
             Edit
           </button>
@@ -85,6 +106,13 @@ export default function Topbar({
           </Link>
         )}
       </div>
+
+      <UpdateFacilityStatusModal
+        isOpen={isStatusModalOpen}
+        currentStatus={currentStatus}
+        onClose={() => setIsStatusModalOpen(false)}
+        onSave={handleSaveStatus}
+      />
     </header>
   );
 }
