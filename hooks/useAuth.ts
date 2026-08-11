@@ -13,6 +13,7 @@ interface UseAuthReturn {
   signIn: (email: string, password: string) => Promise<boolean>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<boolean>;
+  updatePassword: (newPassword: string) => Promise<boolean>;
 }
 
 export function useAuth(): UseAuthReturn {
@@ -71,6 +72,16 @@ export function useAuth(): UseAuthReturn {
     return true;
   }, []);
 
+  const updatePassword = useCallback(async (newPassword: string) => {
+    setError(null);
+    const { error: err } = await authService.updatePassword(newPassword);
+    if (err) {
+      setError(err);
+      return false;
+    }
+    return true;
+  }, []);
+
   return {
     user,
     session,
@@ -80,5 +91,6 @@ export function useAuth(): UseAuthReturn {
     signIn,
     signOut,
     resetPassword,
+    updatePassword,
   };
 }
