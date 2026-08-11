@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { X } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { X, LogOut } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 const NAV_ITEMS = [
   { label: "Dashboard", href: "/dashboard" },
@@ -23,9 +25,24 @@ interface SidebarProps {
 
 export default function Sidebar({ open, onClose }: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { signOut } = useAuth();
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  async function handleLogout() {
+    setLoggingOut(true);
+    try {
+      await signOut();
+    } catch {
+    } finally {
+      setLoggingOut(false);
+      router.push("/login");
+    }
+  }
 
   return (
     <>
+      {/* Mobile backdrop */}
       <div
         onClick={onClose}
         aria-hidden="true"
@@ -37,7 +54,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
       <aside
         role="navigation"
         aria-label="Dashboard navigation"
-        className={`fixed inset-y-0 left-0 z-50 flex w-60 shrink-0 flex-col bg-green-900 px-base py-lg transition-transform duration-300 ease-out md:sticky md:top-0 md:h-dvh md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-64 shrink-0 flex-col bg-green-900 px-base py-lg transition-transform duration-300 ease-out md:sticky md:top-0 md:h-dvh md:translate-x-0 ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -88,6 +105,18 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
             );
           })}
         </nav>
+
+        <div className="mt-auto border-t border-white/10 pt-base">
+          <button
+            type="button"
+            onClick={handleLogout}
+            disabled={loggingOut}
+            className="flex w-full items-center gap-xs rounded-md px-base py-sm font-body text-body-sm text-white/70 transition-colors hover:bg-white/5 hover:text-white disabled:opacity-60"
+          >
+            <LogOut size={16} />
+            {loggingOut ? "Logging out…" : "Logout"}
+          </button>
+        </div>
       </aside>
     </>
   );

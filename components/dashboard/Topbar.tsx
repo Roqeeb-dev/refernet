@@ -1,6 +1,8 @@
 "use client";
 
-import { Bell, Menu } from "lucide-react";
+import Link from "next/link";
+import { Bell, Menu, User } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 interface TopbarProps {
   facilityName: string;
@@ -19,6 +21,9 @@ export default function Topbar({
   onEditStatus,
   hasNotifications = true,
 }: TopbarProps) {
+  const { user, loading } = useAuth();
+  const initials = user?.email ? user.email.charAt(0).toUpperCase() : null;
+
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between border-b border-gray-200 bg-white px-base py-sm md:px-xl">
       <div className="flex min-w-0 items-center gap-base">
@@ -67,6 +72,18 @@ export default function Topbar({
             <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-emergency" />
           )}
         </button>
+
+        {loading ? (
+          <div className="h-9 w-9 animate-pulse rounded-full bg-gray-200" />
+        ) : (
+          <Link
+            href="/dashboard/profile"
+            aria-label="Facility profile"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-green-100 font-body text-body-sm font-semibold text-green-700 transition-colors hover:bg-green-200"
+          >
+            {initials ?? <User size={16} />}
+          </Link>
+        )}
       </div>
     </header>
   );
