@@ -36,7 +36,7 @@ export default function PaperBridgeStepper({
               <div
                 className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full font-body text-caption font-semibold ${
                   status === "upcoming"
-                    ? "border border-gray-200 bg-white text-text-disabled"
+                    ? "bg-gray-100 text-text-disabled"
                     : "bg-green-500 text-white"
                 }`}
               >

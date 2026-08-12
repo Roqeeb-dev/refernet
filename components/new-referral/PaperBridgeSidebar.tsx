@@ -19,22 +19,24 @@ function InfoCard({
 }) {
   return (
     <div
-      className={`rounded-lg border p-base ${
+      className={`rounded-xl border p-sm ${
         highlighted
           ? "border-green-100 bg-green-50"
           : "border-gray-100 bg-white"
       }`}
     >
-      <div className="mb-xs flex items-center gap-xs">
+      <div className="mb-[2px] flex items-center gap-xs">
         <Icon
-          size={14}
+          size={13}
           className={highlighted ? "text-green-700" : "text-text-secondary"}
         />
-        <p className="font-body text-body-sm font-semibold text-text-primary">
+        <p className="font-body text-caption font-semibold text-text-primary">
           {title}
         </p>
       </div>
-      <p className="font-body text-caption text-text-secondary">{children}</p>
+      <p className="font-body text-caption leading-relaxed text-text-secondary">
+        {children}
+      </p>
     </div>
   );
 }
@@ -76,11 +78,11 @@ function AvailabilityKeyCard() {
   ];
 
   return (
-    <div className="rounded-lg border border-gray-100 bg-white p-base">
-      <p className="mb-sm font-body text-body-sm font-semibold text-text-primary">
+    <div className="rounded-xl border border-gray-100 bg-white p-sm">
+      <p className="mb-xs font-body text-caption font-semibold text-text-primary">
         Availability Key
       </p>
-      <div className="flex flex-col gap-sm">
+      <div className="flex flex-col gap-xs">
         {items.map((item) => (
           <div key={item.label} className="flex items-center gap-xs">
             <span className={`h-2 w-2 shrink-0 rounded-full ${item.color}`} />
@@ -130,7 +132,7 @@ export default function PaperBridgeSidebar({ step }: { step: string }) {
   const Content = SIDEBAR_BY_STEP[step] ?? UploadSidebar;
 
   return (
-    <aside className="flex min-w-[260px] flex-[1_1_260px] flex-col gap-base">
+    <aside className="flex min-w-[260px] flex-[1_1_260px] flex-col gap-sm">
       <Content />
     </aside>
   );

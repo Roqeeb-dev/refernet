@@ -43,16 +43,12 @@ const ACCENT_STYLES = {
   green: {
     iconBg: "bg-green-50",
     iconColor: "text-green-700",
-    badgeBg: "bg-green-50",
-    badgeText: "text-green-700",
     buttonClass: "border border-green-200 bg-green-50 hover:bg-green-100",
     buttonTextStyle: { color: "#1E7A47" },
   },
   blue: {
     iconBg: "bg-info-light",
     iconColor: "text-info",
-    badgeBg: "bg-info-light",
-    badgeText: "text-info",
     buttonClass: "border border-info bg-white hover:bg-info-light",
     buttonTextStyle: { color: "#2563EB" },
   },
@@ -62,11 +58,11 @@ export default function ChooseReferralTypePage() {
   return (
     <div>
       {/* Page header */}
-      <div className="border-b border-gray-100 px-base py-base">
+      <div className="border-b border-gray-200 px-base py-xs bg-white">
         <p className="font-body text-caption text-text-secondary">
           New Referral
         </p>
-        <h1 className="font-display text-heading-lg font-bold text-text-primary">
+        <h1 className="font-display text-heading-md font-bold text-text-primary">
           Choose Referral Type
         </h1>
       </div>
@@ -102,9 +98,8 @@ export default function ChooseReferralTypePage() {
                   >
                     <Icon size={18} className={accent.iconColor} />
                   </div>
-                  <span
-                    className={`rounded-full px-base py-xs font-body text-caption font-semibold ${accent.badgeBg} ${accent.badgeText}`}
-                  >
+
+                  <span className="rounded-full bg-info-light px-base py-xs font-body text-caption font-semibold text-info">
                     {pathway.badge}
                   </span>
                 </div>
@@ -119,7 +114,7 @@ export default function ChooseReferralTypePage() {
                 <ol className="mb-lg flex flex-col gap-xs">
                   {pathway.steps.map((step, index) => (
                     <li key={step} className="flex items-center gap-sm">
-                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green-100 font-body text-caption font-semibold text-green-700">
+                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-info-light font-body text-caption font-semibold text-info">
                         {index + 1}
                       </span>
                       <span className="font-body text-body-sm text-text-secondary">

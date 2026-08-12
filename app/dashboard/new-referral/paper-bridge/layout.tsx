@@ -34,7 +34,6 @@ export default function PaperBridgeLayout({
 
   return (
     <div className="flex min-h-full flex-col">
-      {/* Header: breadcrumb, title, stepper */}
       <div className="border-b border-gray-100 bg-white px-base py-base">
         <div className="mb-xs flex items-center gap-sm">
           <span className="font-body text-caption text-text-secondary">
@@ -45,17 +44,14 @@ export default function PaperBridgeLayout({
             Paper Bridge
           </span>
         </div>
-        <h1 className="mb-lg font-display text-heading-lg font-bold text-text-primary">
+        <h1 className="mb-base font-display text-heading-md font-bold text-text-primary">
           {title}
         </h1>
 
         <PaperBridgeStepper currentIndex={currentIndex} />
       </div>
 
-      {/* Body: main content + context-aware right sidebar.
-          flex-wrap (not a breakpoint prefix) is what makes the sidebar
-          drop below the main content on narrow screens. */}
-      <div className="flex flex-1 flex-wrap gap-lg bg-gray-50 p-base">
+      <div className="flex flex-1 flex-wrap gap-lg bg-gray-50 p-lg">
         <div className="min-w-[320px] flex-[2_1_480px]">{children}</div>
         <PaperBridgeSidebar step={currentStepKey} />
       </div>
