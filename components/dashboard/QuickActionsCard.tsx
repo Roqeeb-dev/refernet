@@ -8,7 +8,7 @@ interface QuickActionsCardProps {
 }
 
 export default function QuickActionsCard({
-  newReferralHref = "/dashboard/referrals/new",
+  newReferralHref = "/dashboard/new-referral",
   onUpdateStatus,
 }: QuickActionsCardProps) {
   return (
