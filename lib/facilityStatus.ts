@@ -12,6 +12,12 @@ export interface FacilityStatusOption {
   bgColor: string;
 }
 
+export type FacilityAvailability =
+  | "accepting"
+  | "limited"
+  | "emergency-only"
+  | "unavailable";
+
 export const FACILITY_STATUS_OPTIONS: FacilityStatusOption[] = [
   {
     value: "accepting",
@@ -49,5 +55,58 @@ export function getFacilityStatusOption(
   return (
     FACILITY_STATUS_OPTIONS.find((option) => option.value === value) ??
     FACILITY_STATUS_OPTIONS[0]
+  );
+}
+
+export interface FacilityAvailabilityOption {
+  value: FacilityAvailability;
+  label: string;
+  dotColor: string;
+  bg: string;
+  text: string;
+  selectable: boolean;
+}
+
+export const FACILITY_AVAILABILITY_OPTIONS: FacilityAvailabilityOption[] = [
+  {
+    value: "accepting",
+    label: "Accepting",
+    dotColor: "bg-green-500",
+    bg: "bg-green-50",
+    text: "text-green-700",
+    selectable: true,
+  },
+  {
+    value: "limited",
+    label: "Limited Capacity",
+    dotColor: "bg-urgent",
+    bg: "bg-urgent-light",
+    text: "text-urgent",
+    selectable: true,
+  },
+  {
+    value: "emergency-only",
+    label: "Emergency Only",
+    dotColor: "bg-status-emergency-only",
+    bg: "bg-status-emergency-only/10",
+    text: "text-status-emergency-only",
+    selectable: true,
+  },
+  {
+    value: "unavailable",
+    label: "Unavailable",
+    dotColor: "bg-gray-400",
+    bg: "bg-gray-100",
+    text: "text-text-secondary",
+    selectable: false,
+  },
+];
+
+export function getFacilityAvailabilityOption(
+  value: FacilityAvailability,
+): FacilityAvailabilityOption {
+  return (
+    FACILITY_AVAILABILITY_OPTIONS.find((option) => option.value === value) ??
+    FACILITY_AVAILABILITY_OPTIONS[0]
   );
 }

@@ -1,101 +1,101 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Button from "@/components/shared/Button";
 import {
-  FACILITY_STATUS_OPTIONS,
-  type FacilityStatusValue,
-} from "@/lib/facilityStatus";
+  FACILITY_AVAILABILITY_OPTIONS,
+  type FacilityAvailabilityStatus,
+} from "@/lib/facility";
 
 interface UpdateFacilityStatusModalProps {
-  isOpen: boolean;
-  currentStatus: FacilityStatusValue;
+  open: boolean;
+  currentStatus: FacilityAvailabilityStatus;
   onClose: () => void;
-  onSave: (status: FacilityStatusValue) => void;
+  onSave: (status: FacilityAvailabilityStatus) => void | Promise<void>;
 }
 
 export default function UpdateFacilityStatusModal({
-  isOpen,
+  open,
   currentStatus,
   onClose,
   onSave,
 }: UpdateFacilityStatusModalProps) {
-  const [selected, setSelected] = useState<FacilityStatusValue>(currentStatus);
+  const [selected, setSelected] =
+    useState<FacilityAvailabilityStatus>(currentStatus);
+  const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    if (isOpen) setSelected(currentStatus);
-  }, [isOpen, currentStatus]);
+  if (!open) return null;
 
-  if (!isOpen) return null;
-
-  function handleSave() {
-    onSave(selected);
-    onClose();
+  async function handleSave() {
+    setSaving(true);
+    try {
+      await onSave(selected);
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
-    <div
-      role="presentation"
-      onClick={onClose}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-green-900/40 p-base backdrop-blur-sm"
-    >
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-base">
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="Update facility status"
-        onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-[420px] rounded-2xl bg-white p-lg shadow-floating"
+        aria-label="Update Facility Status"
+        className="w-full max-w-md rounded-2xl bg-white p-xl shadow-floating"
       >
-        <h2 className="mb-base border-b border-gray-100 pb-base font-mono text-heading-lg font-bold text-green-900">
+        <h2 className="mb-lg font-display text-heading-lg font-bold text-green-900">
           Update Facility Status
         </h2>
 
         <div className="flex flex-col gap-sm">
-          {FACILITY_STATUS_OPTIONS.map((option) => {
-            const active = selected === option.value;
+          {FACILITY_AVAILABILITY_OPTIONS.map((option) => {
+            const active = option.value === selected;
             return (
               <button
                 key={option.value}
                 type="button"
                 onClick={() => setSelected(option.value)}
-                aria-pressed={active}
-                className={`flex items-center justify-between rounded-xl border p-md text-left transition-colors ${
+                className={`flex items-center justify-between rounded-lg border px-base py-base text-left transition-colors ${
                   active
-                    ? `${option.bgColor} border-transparent`
-                    : "border-gray-100 bg-white hover:border-gray-200"
+                    ? `${option.bgColor} border-green-200`
+                    : "border-gray-200 bg-white hover:bg-gray-50"
                 }`}
               >
                 <span className="flex items-center gap-sm">
                   <span
-                    className={`h-2.5 w-2.5 shrink-0 rounded-full ${option.dotColor}`}
+                    className={`h-2.5 w-2.5 rounded-full ${option.dotColor}`}
                   />
                   <span
-                    className={`font-body text-body-lg font-medium ${
+                    className={`font-body text-body-md font-semibold ${
                       active ? option.textColor : "text-text-primary"
                     }`}
                   >
-                    {option.label}
+                    {option.longLabel}
                   </span>
                 </span>
                 {active && (
-                  <span
-                    className={`h-7 w-7 shrink-0 rounded-full ${option.dotColor}`}
-                  />
+                  <span className={`h-5 w-5 rounded-full ${option.dotColor}`} />
                 )}
               </button>
             );
           })}
         </div>
 
-        <div className="mt-xl flex gap-sm border-t border-gray-100 pt-lg">
+        <div className="mt-xl flex items-center gap-sm">
           <Button
             variant="outline"
+            fullWidth
             onClick={onClose}
-            className="border-gray-200 text-text-primary hover:bg-gray-50"
+            disabled={saving}
           >
             Cancel
           </Button>
-          <Button variant="primary" className="flex-1" onClick={handleSave}>
+          <Button
+            variant="primary"
+            fullWidth
+            onClick={handleSave}
+            isLoading={saving}
+          >
             Save Status
           </Button>
         </div>
