@@ -3,19 +3,9 @@
 import { Check } from "lucide-react";
 import {
   getFacilityAvailabilityOption,
-  type FacilityAvailability,
-} from "@/lib/facilityStatus";
-
-export interface Facility {
-  id: string;
-  name: string;
-  type: string;
-  distanceKm: number;
-  address: string;
-  updatedMinutesAgo: number;
-  status: FacilityAvailability;
-  note?: string;
-}
+  getFacilityTypeLabel,
+  type Facility,
+} from "@/lib/facility";
 
 interface FacilityCardProps {
   facility: Facility;
@@ -52,7 +42,7 @@ export default function FacilityCard({
       )}
 
       <span
-        className={`inline-flex w-fit items-center gap-xs rounded-full px-sm py-[2px] font-body text-caption font-semibold ${statusOption.bg} ${statusOption.text}`}
+        className={`inline-flex w-fit items-center gap-xs rounded-full px-sm py-[2px] font-body text-caption font-semibold ${statusOption.bgColor} ${statusOption.textColor}`}
       >
         <span className={`h-1.5 w-1.5 rounded-full ${statusOption.dotColor}`} />
         {statusOption.label}
@@ -63,7 +53,7 @@ export default function FacilityCard({
           {facility.name}
         </p>
         <p className="font-body text-caption text-text-secondary">
-          {facility.type} · {facility.distanceKm} km
+          {getFacilityTypeLabel(facility.type)} · {facility.distanceKm} km
         </p>
         <p className="font-body text-caption text-text-disabled">
           {facility.address} · Updated {facility.updatedMinutesAgo} min ago
@@ -72,7 +62,7 @@ export default function FacilityCard({
 
       {facility.note && (
         <p
-          className={`rounded-md px-sm py-xs font-body text-caption font-medium ${statusOption.bg} ${statusOption.text}`}
+          className={`rounded-md px-sm py-xs font-body text-caption font-medium ${statusOption.bgColor} ${statusOption.textColor}`}
         >
           {facility.note}
         </p>

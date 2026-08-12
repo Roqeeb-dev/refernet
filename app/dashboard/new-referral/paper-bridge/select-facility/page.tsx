@@ -4,10 +4,9 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
 import Button from "@/components/shared/Button";
-import FacilityCard, {
-  type Facility,
-} from "@/components/new-referral/FacilityCard";
+import FacilityCard from "@/components/new-referral/FacilityCard";
 import EmptyFacilityState from "@/components/new-referral/EmptyFacilityState";
+import { FACILITY_TYPE_OPTIONS, type Facility } from "@/lib/facility";
 
 // TODO: replace with a real facility search query (Supabase) once the
 // facility directory exists. Distances/status/timestamps are all mock.
@@ -15,7 +14,7 @@ const MOCK_FACILITIES: Facility[] = [
   {
     id: "1",
     name: "Lagos Island General Hospital",
-    type: "General Hospital",
+    type: "general_hospital",
     distanceKm: 2.3,
     address: "Lagos Island, Lagos",
     updatedMinutesAgo: 8,
@@ -24,7 +23,7 @@ const MOCK_FACILITIES: Facility[] = [
   {
     id: "2",
     name: "Lagos University Teaching Hospital",
-    type: "Teaching Hospital",
+    type: "tertiary_hospital",
     distanceKm: 5.1,
     address: "Idi-Araba, Lagos",
     updatedMinutesAgo: 12,
@@ -34,17 +33,17 @@ const MOCK_FACILITIES: Facility[] = [
   {
     id: "3",
     name: "Reddington Hospital",
-    type: "Private Hospital",
+    type: "specialist_hospital",
     distanceKm: 8.7,
     address: "Victoria Island, Lagos",
     updatedMinutesAgo: 3,
-    status: "emergency-only",
+    status: "emergency_only",
     note: "Only emergency cases accepted",
   },
   {
     id: "4",
     name: "St Nicholas Hospital",
-    type: "Private Hospital",
+    type: "specialist_hospital",
     distanceKm: 12.4,
     address: "Lagos Island, Lagos",
     updatedMinutesAgo: 6,
@@ -53,7 +52,7 @@ const MOCK_FACILITIES: Facility[] = [
   {
     id: "5",
     name: "UCH — University College Hospital",
-    type: "Teaching Hospital",
+    type: "tertiary_hospital",
     distanceKm: 134,
     address: "Ibadan North, Oyo",
     updatedMinutesAgo: 60,
@@ -62,7 +61,7 @@ const MOCK_FACILITIES: Facility[] = [
   {
     id: "6",
     name: "Eko Hospital",
-    type: "Private Hospital",
+    type: "specialist_hospital",
     distanceKm: 3.9,
     address: "Surulere, Lagos",
     updatedMinutesAgo: 2,
@@ -73,7 +72,6 @@ const MOCK_FACILITIES: Facility[] = [
 const STATES = Array.from(
   new Set(MOCK_FACILITIES.map((f) => f.address.split(",").pop()!.trim())),
 );
-const TYPES = Array.from(new Set(MOCK_FACILITIES.map((f) => f.type)));
 
 export default function SelectFacilityPage() {
   const router = useRouter();
@@ -109,9 +107,8 @@ export default function SelectFacilityPage() {
 
   function handleNext() {
     if (!selectedId) return;
-    // TODO: persist selectedId onto the referral draft (see
-    // usePaperReferralDraftStore) before advancing to Review & Confirm.
-    router.push("/dashboard/referrals/new/paper-bridge/review");
+    // TODO: persist selectedId onto the referral draft before advancing.
+    router.push("/dashboard/new-referral/paper-bridge/review");
   }
 
   return (
@@ -152,9 +149,9 @@ export default function SelectFacilityPage() {
           className="h-tap-preferred w-full rounded-md border border-gray-200 bg-white px-base font-body text-body-sm text-text-primary focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500"
         >
           <option value="all">All Types</option>
-          {TYPES.map((type) => (
-            <option key={type} value={type}>
-              {type}
+          {FACILITY_TYPE_OPTIONS.map((type) => (
+            <option key={type.value} value={type.value}>
+              {type.label}
             </option>
           ))}
         </select>
