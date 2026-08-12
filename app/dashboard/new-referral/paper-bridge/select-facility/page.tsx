@@ -53,7 +53,7 @@ export default function SelectFacilityPage() {
     const facility = MOCK_FACILITIES.find((f) => f.id === selectedId);
     if (!facility) return;
     setReceivingFacility(facility);
-    router.push("/dashboard/referrals/new/paper-bridge/review");
+    router.push("/dashboard/new-referral/paper-bridge/review");
   }
 
   return (
