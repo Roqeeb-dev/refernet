@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { UploadCloud, FileCheck2, X, Loader2 } from "lucide-react";
+import { UploadCloud, FileCheck2, X, Loader2, AlertCircle } from "lucide-react";
 import {
   uploadFacilityDocument,
   deleteFacilityDocument,
@@ -39,7 +39,6 @@ export default function FileUpload({
     setStatus("uploading");
     setFileName(file.name);
 
-    // Clean up the previous file for this slot, if replacing one.
     if (value) {
       await deleteFacilityDocument(value);
     }
@@ -85,23 +84,26 @@ export default function FileUpload({
         }}
         onDragOver={(e) => {
           e.preventDefault();
-          setIsDragging(true);
+          if (status !== "uploading") setIsDragging(true);
         }}
         onDragLeave={() => setIsDragging(false)}
         onDrop={(e) => {
           e.preventDefault();
           setIsDragging(false);
+          if (status === "uploading") return;
           const file = e.dataTransfer.files?.[0];
           if (file) handleFile(file);
         }}
-        className={`flex min-h-[140px] cursor-pointer flex-col items-center justify-center gap-sm rounded-md border border-dashed px-base py-2xl text-center transition-colors ${
+        className={`group flex min-h-[140px] cursor-pointer flex-col items-center justify-center gap-sm rounded-lg border-2 border-dashed px-base py-2xl text-center transition-all duration-150 ${
           status === "error"
-            ? "border-emergency bg-emergency-light"
+            ? "border-emergency bg-emergency-light hover:border-emergency"
             : status === "success"
-              ? "border-green-500 bg-green-50"
+              ? "border-green-500 bg-green-50 shadow-sm hover:border-green-600 hover:shadow"
               : isDragging
-                ? "border-green-500 bg-green-50"
-                : "border-gray-200 bg-white hover:border-green-100"
+                ? "scale-[1.01] border-green-500 bg-green-50 shadow-md"
+                : status === "uploading"
+                  ? "cursor-wait border-green-300 bg-green-50/50"
+                  : "border-gray-200 bg-white hover:border-green-400 hover:bg-green-50/40 hover:shadow-sm active:scale-[0.99]"
         }`}
       >
         <input
@@ -126,28 +128,57 @@ export default function FileUpload({
 
         {status === "success" && (
           <div className="flex w-full items-center justify-between gap-sm px-sm">
-            <div className="flex items-center gap-sm">
-              <FileCheck2 size={22} className="shrink-0 text-green-700" />
-              <span className="truncate font-body text-body-md text-text-primary">
-                {fileName}
-              </span>
+            <div className="flex min-w-0 items-center gap-sm">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-100">
+                <FileCheck2 size={20} className="text-green-700" />
+              </div>
+              <div className="min-w-0 text-left">
+                <p className="truncate font-body text-body-md font-semibold text-text-primary">
+                  {fileName}
+                </p>
+                <p className="font-body text-caption text-green-700">
+                  Uploaded successfully
+                </p>
+              </div>
             </div>
             <button
               type="button"
               onClick={handleRemove}
               aria-label="Remove file"
-              className="shrink-0 rounded-full p-xs text-text-secondary hover:bg-gray-100 hover:text-emergency"
+              className="shrink-0 rounded-full p-xs text-text-secondary transition-colors hover:bg-white hover:text-emergency"
             >
               <X size={16} />
             </button>
           </div>
         )}
 
-        {(status === "idle" || status === "error") && (
+        {status === "error" && (
           <>
-            <UploadCloud size={28} className="text-text-secondary" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white">
+              <AlertCircle size={22} className="text-emergency" />
+            </div>
+            <p className="font-body text-body-md font-medium text-text-primary">
+              Click to try again or drag &amp; drop
+            </p>
+            <p className="font-body text-body-sm text-text-secondary">
+              PDF, JPG, PNG — max 10MB
+            </p>
+          </>
+        )}
+
+        {status === "idle" && (
+          <>
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 transition-colors group-hover:bg-green-100">
+              <UploadCloud
+                size={22}
+                className="text-text-secondary transition-colors group-hover:text-green-700"
+              />
+            </div>
             <p className="font-body text-body-md text-text-primary">
-              Click to browse or drag &amp; drop
+              <span className="font-semibold text-green-700 group-hover:underline">
+                Click to browse
+              </span>{" "}
+              or drag &amp; drop
             </p>
             <p className="font-body text-body-sm text-text-secondary">
               PDF, JPG, PNG — max 10MB

@@ -1,11 +1,13 @@
 "use client";
 
+import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { FileText } from "lucide-react";
 import PaperBridgeStepper, {
   PAPER_BRIDGE_STEPS,
 } from "@/components/new-referral/PaperBridgeStepper";
 import PaperBridgeSidebar from "@/components/new-referral/PaperBridgeSidebar";
+import { usePaperReferralDraftStore } from "@/store/useDraftId";
 
 const STEP_TITLES: Record<string, string> = {
   upload: "Upload Paper Referral",
@@ -32,6 +34,13 @@ export default function PaperBridgeLayout({
   );
   const title = STEP_TITLES[currentStepKey] ?? "New Referral";
 
+  useEffect(() => {
+    (async () => {
+      await usePaperReferralDraftStore.persist.rehydrate();
+      usePaperReferralDraftStore.getState().ensureDraftId();
+    })();
+  }, []);
+
   return (
     <div className="flex min-h-full flex-col">
       <div className="border-b border-gray-100 bg-white px-base py-base">
@@ -51,9 +60,13 @@ export default function PaperBridgeLayout({
         <PaperBridgeStepper currentIndex={currentIndex} />
       </div>
 
-      <div className="flex flex-1 flex-wrap gap-lg bg-gray-50 p-lg">
-        <div className="min-w-[320px] flex-[2_1_480px]">{children}</div>
-        <PaperBridgeSidebar step={currentStepKey} />
+      <div className="flex flex-1 justify-center bg-gray-50 p-lg">
+        <div className="flex w-full max-w-6xl flex-wrap gap-lg">
+          <div className="min-w-[320px] flex-[2_1_480px] max-w-[800px]">
+            {children}
+          </div>
+          <PaperBridgeSidebar step={currentStepKey} />
+        </div>
       </div>
     </div>
   );
