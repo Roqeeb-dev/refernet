@@ -6,68 +6,9 @@ import { Search } from "lucide-react";
 import Button from "@/components/shared/Button";
 import FacilityCard from "@/components/new-referral/FacilityCard";
 import EmptyFacilityState from "@/components/new-referral/EmptyFacilityState";
-import { FACILITY_TYPE_OPTIONS, type Facility } from "@/lib/facility";
-
-// TODO: replace with a real facility search query (Supabase) once the
-// facility directory exists. Distances/status/timestamps are all mock.
-const MOCK_FACILITIES: Facility[] = [
-  {
-    id: "1",
-    name: "Lagos Island General Hospital",
-    type: "general_hospital",
-    distanceKm: 2.3,
-    address: "Lagos Island, Lagos",
-    updatedMinutesAgo: 8,
-    status: "accepting",
-  },
-  {
-    id: "2",
-    name: "Lagos University Teaching Hospital",
-    type: "tertiary_hospital",
-    distanceKm: 5.1,
-    address: "Idi-Araba, Lagos",
-    updatedMinutesAgo: 12,
-    status: "limited",
-    note: "Limited beds — confirm before sending",
-  },
-  {
-    id: "3",
-    name: "Reddington Hospital",
-    type: "specialist_hospital",
-    distanceKm: 8.7,
-    address: "Victoria Island, Lagos",
-    updatedMinutesAgo: 3,
-    status: "emergency_only",
-    note: "Only emergency cases accepted",
-  },
-  {
-    id: "4",
-    name: "St Nicholas Hospital",
-    type: "specialist_hospital",
-    distanceKm: 12.4,
-    address: "Lagos Island, Lagos",
-    updatedMinutesAgo: 6,
-    status: "accepting",
-  },
-  {
-    id: "5",
-    name: "UCH — University College Hospital",
-    type: "tertiary_hospital",
-    distanceKm: 134,
-    address: "Ibadan North, Oyo",
-    updatedMinutesAgo: 60,
-    status: "unavailable",
-  },
-  {
-    id: "6",
-    name: "Eko Hospital",
-    type: "specialist_hospital",
-    distanceKm: 3.9,
-    address: "Surulere, Lagos",
-    updatedMinutesAgo: 2,
-    status: "accepting",
-  },
-];
+import { FACILITY_TYPE_OPTIONS } from "@/lib/facility";
+import { usePaperReferralDraftStore } from "@/store/useDraftId";
+import { MOCK_FACILITIES } from "@/lib/data";
 
 const STATES = Array.from(
   new Set(MOCK_FACILITIES.map((f) => f.address.split(",").pop()!.trim())),
@@ -75,6 +16,9 @@ const STATES = Array.from(
 
 export default function SelectFacilityPage() {
   const router = useRouter();
+  const setReceivingFacility = usePaperReferralDraftStore(
+    (s) => s.setReceivingFacility,
+  );
 
   const [search, setSearch] = useState("");
   const [stateFilter, setStateFilter] = useState("all");
@@ -106,9 +50,10 @@ export default function SelectFacilityPage() {
   }
 
   function handleNext() {
-    if (!selectedId) return;
-    // TODO: persist selectedId onto the referral draft before advancing.
-    router.push("/dashboard/new-referral/paper-bridge/review");
+    const facility = MOCK_FACILITIES.find((f) => f.id === selectedId);
+    if (!facility) return;
+    setReceivingFacility(facility);
+    router.push("/dashboard/referrals/new/paper-bridge/review");
   }
 
   return (

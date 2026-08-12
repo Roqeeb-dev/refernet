@@ -1,6 +1,7 @@
 // MOCK DASHBOARD DATA
 
 import { Inbox, Send, Clock, TrendingUp } from "lucide-react";
+import { Facility } from "./facility";
 
 export const DASHBOARD_STATS = [
   {
@@ -79,5 +80,64 @@ export const DASHBOARD_RECENT_OUTGOING = [
     referenceCode: "REF-2026-0038",
     facility: "Reddington Hospital Abuja",
     dateSent: "Aug 7, 2026",
+  },
+];
+
+export const MOCK_FACILITIES: Facility[] = [
+  {
+    id: "1",
+    name: "Lagos Island General Hospital",
+    type: "general_hospital",
+    distanceKm: 2.3,
+    address: "Lagos Island, Lagos",
+    updatedMinutesAgo: 8,
+    status: "accepting",
+  },
+  {
+    id: "2",
+    name: "Lagos University Teaching Hospital",
+    type: "tertiary_hospital",
+    distanceKm: 5.1,
+    address: "Idi-Araba, Lagos",
+    updatedMinutesAgo: 12,
+    status: "limited",
+    note: "Limited beds — confirm before sending",
+  },
+  {
+    id: "3",
+    name: "Reddington Hospital",
+    type: "specialist_hospital",
+    distanceKm: 8.7,
+    address: "Victoria Island, Lagos",
+    updatedMinutesAgo: 3,
+    status: "emergency_only",
+    note: "Only emergency cases accepted",
+  },
+  {
+    id: "4",
+    name: "St Nicholas Hospital",
+    type: "specialist_hospital",
+    distanceKm: 12.4,
+    address: "Lagos Island, Lagos",
+    updatedMinutesAgo: 6,
+    status: "accepting",
+  },
+  {
+    id: "5",
+    name: "UCH — University College Hospital",
+    type: "tertiary_hospital",
+    distanceKm: 134,
+    address: "Ibadan North, Oyo",
+    updatedMinutesAgo: 60,
+    status: "unavailable",
+  },
+  {
+    id: "6",
+    name: "Eko Hospital",
+    type: "specialist_hospital",
+    distanceKm: 3.9,
+    address: "Surulere, Lagos",
+    updatedMinutesAgo: 2,
+    status: "accepting",
   },
 ];
