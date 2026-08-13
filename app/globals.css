@@ -78,7 +78,7 @@
 
   /*  Touch Targets  */
   --tap-min: 44px;
-  --tap-preferred: 48px;
+  --tap-preferred: 44px;
   --tap-gap-min: 8px;
   --tap-hit-slop: 8px;
 }

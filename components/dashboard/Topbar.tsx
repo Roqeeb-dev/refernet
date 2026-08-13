@@ -5,40 +5,37 @@ import Link from "next/link";
 import { Bell, Menu, User } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import {
-  getFacilityStatusOption,
-  type FacilityStatusValue,
-} from "@/lib/facilityStatus";
+  getFacilityAvailabilityOption,
+  type FacilityAvailabilityStatus,
+} from "@/lib/facility";
+import { useFacilityStatusStore } from "@/store/useFacilityStatusStore";
 import UpdateFacilityStatusModal from "./UpdateFacilityStatusModal";
 
 interface TopbarProps {
   facilityName: string;
-  status: FacilityStatusValue;
-  lastUpdated: string;
   onMenuClick: () => void;
-  onStatusChange?: (status: FacilityStatusValue) => void;
   hasNotifications?: boolean;
 }
 
 export default function Topbar({
   facilityName,
-  status,
-  lastUpdated,
   onMenuClick,
-  onStatusChange,
   hasNotifications = true,
 }: TopbarProps) {
   const { user, loading } = useAuth();
   const initials = user?.email ? user.email.charAt(0).toUpperCase() : null;
 
-  const [currentStatus, setCurrentStatus] =
-    useState<FacilityStatusValue>(status);
+  // Shared with dashboard/page.tsx's Quick Actions "Update Status" — both
+  // read/write the same store now, so neither can go stale relative to
+  // the other.
+  const { status, lastUpdated, setStatus } = useFacilityStatusStore();
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
 
-  const statusOption = getFacilityStatusOption(currentStatus);
+  const statusOption = getFacilityAvailabilityOption(status);
 
-  function handleSaveStatus(newStatus: FacilityStatusValue) {
-    setCurrentStatus(newStatus);
-    onStatusChange?.(newStatus);
+  function handleSaveStatus(newStatus: FacilityAvailabilityStatus) {
+    setStatus(newStatus);
+    setIsStatusModalOpen(false);
   }
 
   return (
@@ -108,8 +105,8 @@ export default function Topbar({
       </div>
 
       <UpdateFacilityStatusModal
-        isOpen={isStatusModalOpen}
-        currentStatus={currentStatus}
+        open={isStatusModalOpen}
+        currentStatus={status}
         onClose={() => setIsStatusModalOpen(false)}
         onSave={handleSaveStatus}
       />
