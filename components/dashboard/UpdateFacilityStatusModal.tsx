@@ -41,7 +41,7 @@ export default function UpdateFacilityStatusModal({
         role="dialog"
         aria-modal="true"
         aria-label="Update Facility Status"
-        className="w-full max-w-md rounded-2xl bg-white p-xl shadow-floating"
+        className="w-full max-w-[500px] rounded-2xl bg-white p-xl shadow-floating"
       >
         <h2 className="mb-lg font-display text-heading-lg font-bold text-green-900">
           Update Facility Status

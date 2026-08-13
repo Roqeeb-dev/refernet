@@ -5,17 +5,17 @@ import Link from "next/link";
 import { Bell, Menu, User } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import {
-  getFacilityStatusOption,
-  type FacilityStatusValue,
-} from "@/lib/facilityStatus";
+  getFacilityAvailabilityOption,
+  type FacilityAvailabilityStatus,
+} from "@/lib/facility";
 import UpdateFacilityStatusModal from "./UpdateFacilityStatusModal";
 
 interface TopbarProps {
   facilityName: string;
-  status: FacilityStatusValue;
+  status: FacilityAvailabilityStatus;
   lastUpdated: string;
   onMenuClick: () => void;
-  onStatusChange?: (status: FacilityStatusValue) => void;
+  onStatusChange?: (status: FacilityAvailabilityStatus) => void;
   hasNotifications?: boolean;
 }
 
@@ -31,14 +31,15 @@ export default function Topbar({
   const initials = user?.email ? user.email.charAt(0).toUpperCase() : null;
 
   const [currentStatus, setCurrentStatus] =
-    useState<FacilityStatusValue>(status);
+    useState<FacilityAvailabilityStatus>(status);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
 
-  const statusOption = getFacilityStatusOption(currentStatus);
+  const statusOption = getFacilityAvailabilityOption(currentStatus);
 
-  function handleSaveStatus(newStatus: FacilityStatusValue) {
+  function handleSaveStatus(newStatus: FacilityAvailabilityStatus) {
     setCurrentStatus(newStatus);
     onStatusChange?.(newStatus);
+    setIsStatusModalOpen(false);
   }
 
   return (
@@ -108,7 +109,7 @@ export default function Topbar({
       </div>
 
       <UpdateFacilityStatusModal
-        isOpen={isStatusModalOpen}
+        open={isStatusModalOpen}
         currentStatus={currentStatus}
         onClose={() => setIsStatusModalOpen(false)}
         onSave={handleSaveStatus}
