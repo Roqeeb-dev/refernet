@@ -18,15 +18,59 @@ interface AccountStatus {
   dataComplianceCompliant: boolean;
 }
 
+export interface FacilityBasicDetails {
+  facilityName: string;
+  email: string;
+  facilityType: string;
+  phoneNumber: string;
+  /** Read-only here — set during registration, cannot be edited from this page. */
+  registrationNumber: string;
+  website: string;
+}
+
+export interface FacilityLocationDetails {
+  streetAddress: string;
+  lga: string;
+  state: string;
+}
+
+export interface FacilityCapacityDetails {
+  totalBeds: number;
+  icuBeds: number;
+  emergencyBays: number;
+  operatingTheatres: number;
+}
+
+export interface FacilityContactPerson {
+  fullName: string;
+  phone: string;
+  role: string;
+  email: string;
+}
+
+export interface FacilityInfo {
+  basicDetails: FacilityBasicDetails;
+  location: FacilityLocationDetails;
+  capacity: FacilityCapacityDetails;
+  contactPerson: FacilityContactPerson;
+}
+
 interface FacilityProfileState {
   selectedServices: string[];
   staff: StaffMember[];
   accountStatus: AccountStatus;
+  facilityInfo: FacilityInfo;
 
   toggleService: (service: string) => void;
   saveServices: () => Promise<void>;
   addStaff: (member: Omit<StaffMember, "id" | "status">) => void;
   toggleStaffStatus: (id: string) => void;
+
+  setBasicDetails: (data: Partial<FacilityBasicDetails>) => void;
+  setLocation: (data: Partial<FacilityLocationDetails>) => void;
+  setCapacity: (data: Partial<FacilityCapacityDetails>) => void;
+  setContactPerson: (data: Partial<FacilityContactPerson>) => void;
+  saveFacilityInfo: () => Promise<void>;
 }
 
 // TODO: this entire store is a placeholder. Once the `facilities` table
@@ -104,6 +148,34 @@ export const useFacilityProfileStore = create<FacilityProfileState>(
       dataComplianceCompliant: true,
     },
 
+    facilityInfo: {
+      basicDetails: {
+        facilityName: "Lagos University Teaching Hospital",
+        email: "info@luth.gov.ng",
+        facilityType: "Teaching Hospital",
+        phoneNumber: "+234 1 774 0001",
+        registrationNumber: "MDC/NG/LAG/2019/04427",
+        website: "www.luth.gov.ng",
+      },
+      location: {
+        streetAddress: "1 Idi-Araba, Mushin",
+        lga: "Mushin",
+        state: "Lagos",
+      },
+      capacity: {
+        totalBeds: 761,
+        icuBeds: 24,
+        emergencyBays: 16,
+        operatingTheatres: 8,
+      },
+      contactPerson: {
+        fullName: "Dr Chukwuemeka Obi",
+        phone: "+234 803 456 7890",
+        role: "Medical Director",
+        email: "c.obi@luth.gov.ng",
+      },
+    },
+
     toggleService: (service) =>
       set((state) => ({
         selectedServices: state.selectedServices.includes(service)
@@ -136,5 +208,43 @@ export const useFacilityProfileStore = create<FacilityProfileState>(
             : member,
         ),
       })),
+
+    setBasicDetails: (data) =>
+      set((state) => ({
+        facilityInfo: {
+          ...state.facilityInfo,
+          basicDetails: { ...state.facilityInfo.basicDetails, ...data },
+        },
+      })),
+
+    setLocation: (data) =>
+      set((state) => ({
+        facilityInfo: {
+          ...state.facilityInfo,
+          location: { ...state.facilityInfo.location, ...data },
+        },
+      })),
+
+    setCapacity: (data) =>
+      set((state) => ({
+        facilityInfo: {
+          ...state.facilityInfo,
+          capacity: { ...state.facilityInfo.capacity, ...data },
+        },
+      })),
+
+    setContactPerson: (data) =>
+      set((state) => ({
+        facilityInfo: {
+          ...state.facilityInfo,
+          contactPerson: { ...state.facilityInfo.contactPerson, ...data },
+        },
+      })),
+
+    // TODO: replace with a real Supabase update once facilities exists.
+    saveFacilityInfo: async () => {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      console.log("Saved facility info:", get().facilityInfo);
+    },
   }),
 );

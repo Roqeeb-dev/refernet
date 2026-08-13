@@ -1,3 +1,5 @@
+import CurrentStatusCard from "@/components/profile/CurrentStatusCard";
+import FacilityInformationCard from "@/components/profile/FacilityInformationCard";
 import ServicesSpecialtiesCard from "@/components/profile/ServicesSpecialtiesCard";
 import StaffManagementCard from "@/components/profile/StaffManagementCard";
 import ChangePasswordCard from "@/components/profile/ChangePasswordCard";
@@ -15,6 +17,8 @@ export default function FacilityProfilePage() {
         </p>
       </div>
 
+      <CurrentStatusCard />
+      <FacilityInformationCard />
       <ServicesSpecialtiesCard />
       <StaffManagementCard />
       <ChangePasswordCard />
