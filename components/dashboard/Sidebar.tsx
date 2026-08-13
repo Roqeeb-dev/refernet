@@ -8,11 +8,11 @@ import { useAuth } from "@/hooks/useAuth";
 
 const NAV_ITEMS = [
   { label: "Dashboard", href: "/dashboard" },
-  { label: "New Referral", href: "/dashboard/referrals/new" },
-  { label: "Outgoing Referrals", href: "/dashboard/referrals/outgoing" },
+  { label: "New Referral", href: "/dashboard/new-referral" },
+  { label: "Outgoing Referrals", href: "/dashboard/outgoing-referrals" },
   {
     label: "Incoming Referrals",
-    href: "/dashboard/referrals/incoming",
+    href: "/dashboard/incoming-referrals",
     badge: 3,
   },
   { label: "Facility Profile", href: "/dashboard/profile" },

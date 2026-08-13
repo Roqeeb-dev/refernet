@@ -5,10 +5,14 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Button from "@/components/shared/Button";
 import { usePaperReferralDraftStore } from "@/store/useDraftId";
+import { submitPaperReferral } from "@/services/referral.service";
 import type { Facility } from "@/lib/facility";
 
 const isDev = process.env.NODE_ENV === "development";
 
+// Dev-only sample data so this page can be opened directly while building
+// the UI, without having to walk through Upload + Select Facility every
+// time. Never used in production — see the isDev checks below.
 const FALLBACK_DOCUMENT_PATH =
   "paper-referrals/dev/00000000-0000-0000-0000-000000000000-sample-referral.pdf";
 
@@ -43,9 +47,13 @@ export default function ReviewPage() {
     (s) => s.receivingFacility,
   );
   const [confirmed, setConfirmed] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const reset = usePaperReferralDraftStore((s) => s.reset);
 
   const isMissingDraftData = !storeDocumentPath || !storeReceivingFacility;
   const usingFallback = isDev && isMissingDraftData;
+
   useEffect(() => {
     if (!isDev && isMissingDraftData) {
       router.replace("/dashboard/new-referral/paper-bridge/upload");
@@ -62,15 +70,24 @@ export default function ReviewPage() {
   const referenceNumber = getReferenceNumber(draftReferralId);
   const fileName = extractFileName(documentPath);
 
-  function handleSubmit() {
-    // TODO: real submit — insert a row (documentPath, receivingFacility.id,
-    // referenceNumber, status: "pending") into Supabase, then reset() the
-    // draft store and redirect to a confirmation screen.
-    console.log("Submitting referral", {
-      referenceNumber,
+  async function handleSubmit() {
+    setSubmitError("");
+    setSubmitting(true);
+
+    const { referralId, error } = await submitPaperReferral({
       documentPath,
       receivingFacility,
     });
+
+    setSubmitting(false);
+
+    if (error || !referralId) {
+      setSubmitError(error ?? "Something went wrong. Please try again.");
+      return;
+    }
+
+    reset();
+    router.push(`/dashboard/referrals/${referralId}/sent`);
   }
 
   const facilityRows = [
@@ -177,14 +194,25 @@ export default function ReviewPage() {
       </label>
 
       {/* Footer actions */}
+      {submitError && (
+        <p role="alert" className="font-body text-body-sm text-emergency">
+          {submitError}
+        </p>
+      )}
       <div className="mt-base flex flex-wrap items-center justify-between gap-sm">
-        <Button variant="outline" type="button" onClick={() => router.back()}>
+        <Button
+          variant="outline"
+          type="button"
+          onClick={() => router.back()}
+          disabled={submitting}
+        >
           Back
         </Button>
         <Button
           variant="primary"
           type="button"
           disabled={!confirmed}
+          isLoading={submitting}
           onClick={handleSubmit}
         >
           Submit Referral
