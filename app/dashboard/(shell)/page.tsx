@@ -1,7 +1,12 @@
+"use client";
+
+import { useState } from "react";
 import StatCard from "@/components/dashboard/StatCard";
 import QuickActionsCard from "@/components/dashboard/QuickActionsCard";
 import RecentActivityCard from "@/components/dashboard/RecentActivityCard";
 import RecentOutgoingReferralsCard from "@/components/dashboard/RecentOutgoingReferralsCard";
+import UpdateFacilityStatusModal from "@/components/dashboard/UpdateFacilityStatusModal";
+import { useFacilityStatusStore } from "@/store/useFacilityStatusStore";
 import {
   DASHBOARD_STATS,
   DASHBOARD_RECENT_ACTIVITY,
@@ -9,6 +14,9 @@ import {
 } from "@/lib/data";
 
 export default function DashboardPage() {
+  const { status, setStatus } = useFacilityStatusStore();
+  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+
   return (
     <div className="flex flex-col gap-lg">
       <div>
@@ -27,11 +35,21 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid gap-lg lg:grid-cols-[280px_1fr]">
-        <QuickActionsCard />
+        <QuickActionsCard onUpdateStatus={() => setIsStatusModalOpen(true)} />
         <RecentActivityCard activities={DASHBOARD_RECENT_ACTIVITY} />
       </div>
 
       <RecentOutgoingReferralsCard referrals={DASHBOARD_RECENT_OUTGOING} />
+
+      <UpdateFacilityStatusModal
+        open={isStatusModalOpen}
+        currentStatus={status}
+        onClose={() => setIsStatusModalOpen(false)}
+        onSave={(newStatus) => {
+          setStatus(newStatus);
+          setIsStatusModalOpen(false);
+        }}
+      />
     </div>
   );
 }
