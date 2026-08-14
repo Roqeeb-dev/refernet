@@ -7,10 +7,14 @@ import {
   Paperclip,
   ClipboardCheck,
 } from "lucide-react";
+import InfoCard from "./InfoCard";
+import InlineNoteCard from "./InlineNoteCard";
+import NumberedStepsCard from "./NumberedStepCard";
+import AvailabilityKeyCard from "./AvailabilityKeyCard";
 
-type Tone = "default" | "success" | "info" | "warning";
+export type Tone = "default" | "success" | "info" | "warning";
 
-const TONE_STYLES: Record<
+export const TONE_STYLES: Record<
   Tone,
   { border: string; bg: string; iconColor: string; titleColor: string }
 > = {
@@ -40,96 +44,6 @@ const TONE_STYLES: Record<
   },
 };
 
-/** Icon + bold title + body paragraph. The default building block for most cards. */
-function InfoCard({
-  icon: Icon,
-  title,
-  children,
-  tone = "default",
-}: {
-  icon: React.ElementType;
-  title: string;
-  children: React.ReactNode;
-  tone?: Tone;
-}) {
-  const styles = TONE_STYLES[tone];
-
-  return (
-    <div className={`rounded-xl border p-base ${styles.border} ${styles.bg}`}>
-      <div className="mb-xs flex items-center gap-xs">
-        <Icon size={15} className={styles.iconColor} />
-        <p className={`font-body text-body-sm font-bold ${styles.titleColor}`}>
-          {title}
-        </p>
-      </div>
-      <p className="font-body text-caption leading-relaxed text-text-secondary">
-        {children}
-      </p>
-    </div>
-  );
-}
-
-/** Icon + paragraph, no separate title line — for short inline notes. */
-function InlineNoteCard({
-  icon: Icon,
-  children,
-  tone = "info",
-}: {
-  icon: React.ElementType;
-  children: React.ReactNode;
-  tone?: Tone;
-}) {
-  const styles = TONE_STYLES[tone];
-
-  return (
-    <div
-      className={`flex items-start gap-xs rounded-xl border p-base ${styles.border} ${styles.bg}`}
-    >
-      <Icon size={15} className={`mt-[2px] shrink-0 ${styles.iconColor}`} />
-      <p
-        className={`font-body text-caption leading-relaxed ${styles.titleColor}`}
-      >
-        {children}
-      </p>
-    </div>
-  );
-}
-
-/** Bold title + numbered step list — for "What Happens Next" style cards. */
-function NumberedStepsCard({
-  title,
-  steps,
-  tone = "success",
-}: {
-  title: string;
-  steps: string[];
-  tone?: Tone;
-}) {
-  const styles = TONE_STYLES[tone];
-
-  return (
-    <div className={`rounded-xl border p-base ${styles.border} ${styles.bg}`}>
-      <p
-        className={`mb-sm font-body text-body-sm font-bold ${styles.titleColor}`}
-      >
-        {title}
-      </p>
-      <ol className="flex flex-col gap-xs">
-        {steps.map((step, i) => (
-          <li key={i} className="flex items-start gap-xs">
-            <span className="mt-[1px] flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green-100 font-body text-caption font-semibold text-green-700">
-              {i + 1}
-            </span>
-            <span className="font-body text-caption leading-relaxed text-text-secondary">
-              {step}
-            </span>
-          </li>
-        ))}
-      </ol>
-    </div>
-  );
-}
-
 function UploadSidebar() {
   return (
     <>
@@ -155,81 +69,6 @@ function UploadSidebar() {
         facility&apos;s authorised staff, alongside your referral record.
       </InfoCard>
     </>
-  );
-}
-
-interface AvailabilityItem {
-  value: string;
-  label: string;
-  dotColor: string;
-  bg: string;
-  text: string;
-  note?: string;
-}
-
-const AVAILABILITY_ITEMS: AvailabilityItem[] = [
-  {
-    value: "accepting",
-    label: "Accepting",
-    dotColor: "bg-green-500",
-    bg: "bg-green-50",
-    text: "text-green-700",
-  },
-  {
-    value: "limited",
-    label: "Limited Capacity",
-    dotColor: "bg-urgent",
-    bg: "bg-urgent-light",
-    text: "text-urgent",
-  },
-  {
-    value: "emergency-only",
-    label: "Emergency Only",
-    dotColor: "bg-status-emergency-only",
-    bg: "bg-status-emergency-only/10",
-    text: "text-status-emergency-only",
-  },
-  {
-    value: "unavailable",
-    label: "Unavailable",
-    dotColor: "bg-gray-400",
-    bg: "bg-gray-100",
-    text: "text-text-secondary",
-    note: "Cannot be selected",
-  },
-];
-
-function AvailabilityKeyCard() {
-  return (
-    <div>
-      <p className="mb-sm font-body text-body-sm font-bold text-text-primary">
-        Availability Key
-      </p>
-      <div className="flex flex-col gap-xs">
-        {AVAILABILITY_ITEMS.map((item) => (
-          <div
-            key={item.value}
-            className={`flex items-center gap-xs rounded-lg px-base py-sm ${item.bg}`}
-          >
-            <span
-              className={`h-2 w-2 shrink-0 rounded-full ${item.dotColor}`}
-            />
-            <div className="flex flex-col">
-              <span
-                className={`font-body text-caption font-semibold ${item.text}`}
-              >
-                {item.label}
-              </span>
-              {item.note && (
-                <span className="font-body text-caption text-text-disabled">
-                  {item.note}
-                </span>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
   );
 }
 

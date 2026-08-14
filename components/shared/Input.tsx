@@ -40,7 +40,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           }
           className={cn(
             "h-tap-preferred w-full rounded-md border bg-white px-base font-body text-caption text-text-primary",
-            "placeholder:text-text-disabled",
+            "placeholder:text-text-disabled placeholder:text-sm",
             "transition-colors duration-150",
             "focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500",
             "disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-text-disabled",

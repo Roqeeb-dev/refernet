@@ -1,213 +1,227 @@
-# ReferNet
+<div align="center">
 
-**Hospital Finder & Digital Healthcare Facility Referral Portal — MVP**
+# 🏥 ReferNet Nigeria
 
-ReferNet is a digital healthcare coordination platform built for Nigeria's fragmented healthcare environment. It helps patients and caregivers find the right facility to seek care, and helps healthcare providers coordinate patient referrals digitally instead of relying on paper forms and phone calls.
+**Hospital Finder & Digital Healthcare Facility Referral Portal**
 
----
+[![Next.js](https://img.shields.io/badge/Next.js_14%2F15-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Tailwind CSS v4](https://img.shields.io/badge/Tailwind_v4-38BDF8?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
 
-## The Problem
+_Connecting Nigeria's fragmented healthcare ecosystem through real-time care navigation and digital referral coordination._
 
-Discovery research with 16 healthcare providers across 11 Nigerian states found:
-
-- **81.25%** had sent a patient to another facility without confirming that facility had capacity to receive them.
-- **56.25%** had experienced a patient being turned away on arrival.
-- **0** respondents reported using a digital referral coordination system — handwritten referral letters remain the dominant artifact.
-
-The gap isn't the absence of a digital referral _form_. It's the absence of a reliable **patient navigation and facility-to-facility coordination layer**.
+</div>
 
 ---
 
-## What ReferNet Does
+## 📌 Executive Summary
 
-ReferNet ships two interconnected capabilities in its MVP:
+**ReferNet** is a digital health coordination platform designed for low-bandwidth, high-friction clinical environments. It serves a dual purpose:
+
+1. **Smart Care Navigation:** Enables patients and caregivers to find nearby, open, and capable healthcare facilities.
+2. **Facility Referral Portal:** Replaces paper slips and unconfirmed transfers with real-time, bidirectional digital referral workflows between healthcare providers.
+
+> **Why ReferNet?** The barrier to effective healthcare transfers in emerging healthcare systems is rarely the absence of a digital form—it is the absence of a reliable **patient navigation and facility-to-facility coordination layer**.
+
+---
+
+## 📊 The Problem
+
+Primary discovery research conducted with **16 healthcare providers across 11 Nigerian states** revealed critical systemic gaps:
+
+- **81.25%** of providers reported sending patients to another facility without confirming if that facility had the immediate capacity or resources to treat them.
+- **56.25%** experienced a referred patient being turned away upon arrival.
+- **0%** reported using a digital referral coordination platform—handwritten paper referral notes remain the dominant artifact.
+
+---
+
+## 🚀 Core Capabilities
+
+ReferNet ships two integrated workflows:
 
 ### 1. Hospital Finder / Smart Care Navigation
 
-Helps patients and caregivers identify an appropriate facility based on location, urgency, care needs, and real-time facility availability — no medical knowledge required.
+Helps non-clinical users (patients, family members) identify appropriate facilities based on proximity, urgency, and live operational status—no medical knowledge required.
 
-| Pathway                       | For                                                        | Flow                                                                                            |
-| ----------------------------- | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| **Emergency Mode**            | Users who need immediate care                              | Location → Nearby facilities → Availability → Call / Directions / Optional Alert                |
-| **Guided Care Navigation**    | Users unsure what level of care they need                  | Health concern → Guided questions → Recommended care level → Facilities → Availability → Action |
-| **Voice-Assisted Navigation** | Users with limited digital literacy or who prefer speaking | Voice input → Interpretation → Urgency assessment → Recommendation → Facilities → Action        |
+| Pathway                          | Target Audience                         | Interactive Flow                                                                    |
+| :------------------------------- | :-------------------------------------- | :---------------------------------------------------------------------------------- |
+| **🚨 Emergency Mode**            | Users needing immediate critical care   | Location → Nearby Facilities → Availability → Call / Directions / Pre-arrival Alert |
+| **🩺 Guided Care Navigation**    | Users unsure of the required care level | Health Concern → Guided Questions → Recommended Care Level → Facility List → Action |
+| **🎙️ Voice-Assisted Navigation** | Users with limited digital literacy     | Voice Input → NLP Processing → Urgency Flag → Smart Recommendation → Action         |
 
-**Emergency Mode requires no login, no registration, and no symptom questionnaire.** Access to care is never delayed by data collection.
+> ⚡ **Emergency Mode Guarantee:** Zero login, zero registration, and zero upfront symptom questionnaires. Access to emergency care is never delayed by data collection.
 
-Facility availability is always shown as one of:
+#### Real-Time Capacity Indicators
 
-- 🟢 Open & Accepting
-- 🟠 Limited Capacity
-- 🟠 Emergency Only
-- 🔴 Unavailable
+- 🟢 **Open & Accepting:** Full operational capacity.
+- 🟠 **Limited Capacity:** High load; potential wait times.
+- 🟠 **Emergency Only:** Accepting critical cases only.
+- 🔴 **Unavailable:** Diverting referrals due to resource/bed constraints.
+
+---
 
 ### 2. Healthcare Facility Referral Portal
 
-Lets healthcare facilities create, send, receive, and track patient referrals digitally, with essential clinical information traveling with the patient.
+Allows providers to issue, track, accept, decline, and document clinical referrals seamlessly.
 
 ```
-New Referral → Patient Info → Clinical Info → Select Receiving Facility
-→ Review → Confirm → Sent → Accepted/Declined → Patient Arrives
-→ Outcome Recorded → Closed
+┌──────────────┐     ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+│  Create New  │ ──► │ Patient &    │ ──► │ Select Target│ ──► │ Confirm &    │
+│  Referral    │     │ Clinical Info│     │ Facility     │     │ Send         │
+└──────────────┘     └──────────────┘     └──────────────┘     └──────────────┘
+                                                                        │
+┌──────────────┐     ┌──────────────┐     ┌──────────────┐            │
+│ Closed &     │ ◄── │ Patient      │ ◄── │ Accept /     │ ◄──────────┘
+│ Archived     │     │ Arrival      │     │ Decline Flow │
+└──────────────┘     └──────────────┘     └──────────────┘
 ```
 
-Key capabilities:
+#### Key Workflow Features:
 
-- Auto-populated facility identity from the authenticated account
-- Required patient & clinical fields (urgency, chief complaint, diagnosis, history, vitals, medications, prior treatment, reason for referral)
-- Optional diagnostic document upload
-- **Parallel paper-referral pathway** — facilities can photograph/attach existing paper forms instead of abandoning them outright
-- Referral coordinators can act on behalf of a facility (`Created by [Coordinator] on behalf of [Facility]`)
-- Full timestamped audit trail: creation → selection → accept/decline → status changes → arrival → outcome → closure
-
----
-
-## Clinical Safety Boundaries
-
-ReferNet is a **navigation and coordination tool, not a diagnostic tool.**
-
-- Guided Care Navigation provides decision support only — it never tells a user they have a specific condition.
-- Voice-assisted input may structure symptoms and flag urgency, but must never present an AI-generated diagnosis as clinical fact.
-- Any response indicating potentially serious symptoms immediately escalates the user to the Emergency pathway.
-- AI-assisted symptom navigation is explicitly **out of scope** for MVP pending clinical validation (see [Roadmap](#roadmap)).
+- **Auto-Populated Identity:** Institutional meta automatically assigned via authenticated facility context.
+- **Structured Clinical Summaries:** Chief complaint, ICD-aligned diagnosis, vitals, medication history, prior interventions, and reason for transfer.
+- **Paper-Referral Fallback:** Facilities can capture/upload photos of existing paper referral forms without disrupting clinical speed.
+- **Delegated Coordination:** Support for referral coordinators acting on behalf of facilities (`Created by [Coordinator] on behalf of [Facility]`).
+- **Complete Audit Trail:** Timestamped tracking from dispatch, pre-arrival alert, status update, arrival confirmation, to clinical outcome recording.
 
 ---
 
-## Who It's For
+## 🛡️ Clinical Safety & Scope Boundaries
 
-|               | Hospital Finder                               | Referral Portal                                             |
-| ------------- | --------------------------------------------- | ----------------------------------------------------------- |
-| **Primary**   | Patients, caregivers/family members           | Referring & receiving facility staff, referral coordinators |
-| **Secondary** | Community members, patients with basic phones | Hospital administrators, MORES/referral coordinators        |
+> ⚠️ **IMPORTANT DISCLAIMER**
+> ReferNet is a **care navigation and logistical coordination tool**, NOT a clinical diagnostic engine.
 
-Initial facility scope: participating PHCs, general hospitals, specialist hospitals, and tertiary hospitals — the workflow is not limited to PHC → tertiary referrals.
-
----
-
-## Success Metrics
-
-ReferNet is measured on outcomes, not activity. Referral count and hospital-listing count are explicitly **not** treated as primary success metrics.
-
-**North Star:** % of patients who successfully reach an appropriate facility without an avoidable failed visit.
-
-| Objective                      | KPI                                                        |
-| ------------------------------ | ---------------------------------------------------------- |
-| Improve navigation             | % of users who successfully identify a facility            |
-| Reduce wasted journeys         | % of facilities shown unavailable/limited before selection |
-| Improve referral completion    | Referral acceptance rate                                   |
-| Improve coordination           | % of referrals with confirmed patient arrival              |
-| Improve information continuity | % of referrals containing all mandatory clinical fields    |
-| Reduce rejection               | Referral rejection rate                                    |
-| Improve workflow efficiency    | Median time to complete a referral                         |
-| Adoption                       | Monthly active referring/receiving facilities              |
-| User experience                | Provider task-success / satisfaction score                 |
+- **Decision Support Only:** Guided Navigation aids facility selection; it never issues formal clinical diagnoses.
+- **Emergency Escalation:** Any intake string triggering emergency flags automatically routes the user to the immediate Emergency Pathway.
+- **AI Controls:** Voice-assisted algorithms structure reported symptoms and flag urgency tags, but never present AI summaries as verified medical facts.
 
 ---
 
-## MVP Scope
+## 👥 Target Users
 
-**Must Have**
-
-- Nigerian facility directory covering all 36 states + FCT
-- Four-tier facility availability status
-- Location-based search with state/city/area filtering
-- Emergency facility finder + non-emergency care-level navigation
-- External directions/navigation, optional pre-arrival alert
-- Referral creation with mandatory clinical fields + auto-populated facility ID
-- Optional document upload + paper-referral upload fallback
-- Receiving-facility queue with accept/decline workflow
-- Patient arrival confirmation, outcome recording, referral status timeline
-- Full audit trail, role-based access
-- Mobile-first, responsive interface
-- Offline-safe draft capability for referral forms
-
-**Should Have** — specialty search, referral notifications, reference codes, facility status management, coordinator workflow
-
-**Could Have (later MVP iteration)** — multilingual voice assistance, AI-assisted symptom navigation, automated referral quality checks
-
-**Out of Scope for MVP** — AI clinical decision-making, specialist teleconsultation, chronic disease records, government analytics dashboards, USSD workflows, WhatsApp clinical consultation, NHIA/HMO claims, ambulance dispatch
+| Tier          | Hospital Finder                        | Referral Portal                                                   |
+| :------------ | :------------------------------------- | :---------------------------------------------------------------- |
+| **Primary**   | Patients, Caregivers, Family Members   | Referring & Receiving Clinicians, Nurses, Referral Coordinators   |
+| **Secondary** | Community Health Workers, Public Users | Hospital Administrators, State/Regional Referral Officers (MORES) |
 
 ---
 
-## Non-Functional Requirements
+## 🎯 Success Metrics & KPIs
 
-- **Mobile-first**, optimized for Android smartphones
-- Core referral workflows remain usable under **intermittent connectivity**
-- Fast load times under typical Nigerian mobile-network conditions
-- Patient data protected via authentication, authorization, encryption, and audit logging
-- Facility status always displays its **last-updated timestamp**
-- High-contrast status indicators, large touch targets, clear typography
-- Architecture designed to scale from a single state to nationwide deployment
-- Future-compatible with FHIR, without blocking MVP delivery
+ReferNet prioritizes patient outcomes over raw system activity.
+
+- **North Star Metric:** `% of patients who successfully reach an appropriate facility without an avoidable failed transfer.`
+
+| Objective                       | Key Performance Indicator (KPI)                                         |
+| :------------------------------ | :---------------------------------------------------------------------- |
+| **Prevent Wasted Journeys**     | % of facilities displayed as _Unavailable / Limited_ prior to selection |
+| **Improve Referral Completion** | Referral acceptance rate across receiving network                       |
+| **Information Continuity**      | % of referrals dispatched with 100% mandatory clinical fields populated |
+| **Workflow Speed**              | Median time (minutes) to originate and send a referral                  |
+| **Care Coordination**           | % of accepted referrals with verified patient arrival timestamps        |
 
 ---
 
-## Tech Stack
+## 🛠️ Tech Stack & Architecture
 
-- **Framework:** Next.js (App Router) + TypeScript
-- **Styling:** Tailwind CSS v4, token-based design system (`globals.css`)
-- **Backend/Auth/DB:** Supabase (Auth + Postgres)
+- **Framework:** Next.js (App Router, Server Components, Server Actions)
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS v4, Token-based CSS Variables (`globals.css`)
+- **Animations:** Framer Motion
 - **Icons:** Lucide React
+- **Backend & Auth:** Supabase (PostgreSQL + Row Level Security + Auth)
 
 ---
 
-## Getting Started
+## 📂 Directory Structure
+
+```text
+refernet/
+├── app/
+│   ├── (auth)/                  # Authentication routes (Login, Signup, Facility Onboarding)
+│   ├── dashboard/               # Facility Portal
+│   │   └── referrals/
+│   │       └── [id]/            # Referral Detail View, Accept/Decline Modals, Timeline
+│   ├── finder/                  # Patient Hospital Finder & Care Navigation
+│   ├── not-found.tsx            # Custom animated 404 page
+│   ├── layout.tsx               # Root layout & providers
+│   └── page.tsx                 # Public landing / entry point
+├── components/
+│   ├── new-referral/            # Multi-step referral wizard components
+│   ├── shared/                  # Reusable UI library (Button, Modal, Badge, Inputs)
+│   └── navigation/              # Header, Sidebar, and Mobile Nav
+├── lib/
+│   ├── supabase/                # Client, Server, and Middleware Supabase configs
+│   ├── utils.ts                 # Classname merge & helper utilities
+│   └── types.ts                 # Global TypeScript interfaces
+└── public/                      # Static brand assets & vectors
+```
+
+---
+
+## 🚦 Getting Started
 
 ### Prerequisites
 
-- Node.js 18+
-- A Supabase project (URL + anon key)
+- Node.js 18.x or later
+- npm, pnpm, or yarn
+- A Supabase project instance
 
-### Setup
+### Installation
+
+**1. Clone the repository:**
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/your-org/refernet.git
 cd refernet
+```
+
+**2. Install dependencies:**
+
+```bash
 npm install
 ```
+
+**3. Configure Environment Variables:**
 
 Create a `.env.local` file in the project root:
 
 ```env
-NEXT_PUBLIC_SUPABASE_URL=your-supabase-project-url
+NEXT_PUBLIC_SUPABASE_URL=https://your-supabase-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
 ```
 
-Run the dev server:
+**4. Launch Development Server:**
 
 ```bash
 npm run dev
 ```
 
-The app will be available at `http://localhost:3000`.
+Open `http://localhost:3000` in your browser.
 
 ---
 
-## Key Risks
+## ⚠️ Key Operational Risks & Mitigations
 
-| Risk                                 | Mitigation                                                                    |
-| ------------------------------------ | ----------------------------------------------------------------------------- |
-| Facility status goes stale           | Timestamped status, automated expiry, facility reminders                      |
-| Wrong navigation recommendation      | Positioned as navigation support, not diagnosis; safety disclaimers           |
-| Providers abandon the referral form  | Progressive disclosure; mandatory fields limited to clinically essential data |
-| Poor clinical data quality           | Structured fields, validation, paper-upload fallback                          |
-| Connectivity failure mid-referral    | Offline drafts with retry/sync                                                |
-| Low facility adoption                | Start with a geographically concentrated facility network                     |
-| Patient privacy breach               | RBAC, encryption, audit logs, minimal public data exposure                    |
-| AI voice feature gives unsafe advice | Excluded from MVP pending clinical validation                                 |
-
-The single biggest open assumption: **not** whether providers can use the software, but whether facilities will consistently maintain accurate availability statuses.
+| Identified Risk                  | System Mitigation                                                                        |
+| :------------------------------- | :--------------------------------------------------------------------------------------- |
+| Stale Facility Capacity Data     | Mandatory status expiration limits, automated prompts, and last-updated time badges.     |
+| Intermittent Mobile Connectivity | Offline-first draft persistence, queue-and-retry mutation handling.                      |
+| Form Fatigue / Abandonment       | Progressive disclosure UX; strictly enforced minimal essential dataset.                  |
+| Data Privacy & Security          | Granular Row-Level Security (RLS) in Postgres, role-based controls, encrypted transfers. |
 
 ---
 
-## Roadmap
+## 🗺️ Product Roadmap
 
-1. **MVP** — Hospital Finder (Emergency + Guided) + Referral Portal, as scoped above
-2. **Post-MVP** — Voice-assisted navigation, referral coordinator tooling, referral notifications
-3. **Later** — Multilingual voice support (introduced per-language only after speech recognition, clinical terminology, translation, and urgency-classification accuracy are validated), AI-assisted symptom navigation, automated referral quality checks
+- [x] **MVP Phase:** Hospital Finder (Emergency + Guided), Referral Portal Core Workflow, Accept/Decline Modals, Responsive Mobile Layouts.
+- [ ] **Phase 2 (Post-MVP):** Push / SMS / WhatsApp status notifications, specialized referral coordinator portal, automated capacity pulse checks.
+- [ ] **Phase 3 (Scale):** Multilingual voice processing (Hausa, Yoruba, Igbo), HL7 / FHIR data export capability.
 
 ---
 
-## License
+## 📜 License
 
-TBD
+Distributed under the MIT License. See [LICENSE](LICENSE) for details.
