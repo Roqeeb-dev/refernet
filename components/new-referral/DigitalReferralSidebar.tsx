@@ -8,8 +8,10 @@ function PatientInfoSidebar() {
   return (
     <>
       <InfoCard icon={Building2} title="Referring Facility" tone="info">
-        <p className="font-semibold">Lagos University Teaching Hospital</p>
-        <p className="text-text-secondary">+234 812 345 6789</p>
+        <span className="font-semibold block">
+          Lagos University Teaching Hospital
+        </span>
+        <span className="text-text-secondary">+234 812 345 6789</span>
       </InfoCard>
 
       <InfoCard icon={Lock} title="Patient Privacy" tone="info">
