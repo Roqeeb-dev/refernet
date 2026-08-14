@@ -19,7 +19,7 @@ const PATHWAYS = [
       "Review & Submit",
     ],
     cta: "Select Digital Referral",
-    href: null as string | null,
+    href: "/dashboard/new-referral/digital-referral/patient-info",
   },
   {
     key: "paper",
@@ -35,7 +35,7 @@ const PATHWAYS = [
       "Review & Submit",
     ],
     cta: "Select Paper Referral Bridge",
-    href: "/dashboard/new-referral/paper-bridge/upload" as string | null,
+    href: "/dashboard/new-referral/paper-bridge/upload",
   },
 ] as const;
 
@@ -43,7 +43,7 @@ const ACCENT_STYLES = {
   green: {
     iconBg: "bg-green-50",
     iconColor: "text-green-700",
-    buttonClass: "border border-green-200 bg-green-50 hover:bg-green-100",
+    buttonClass: "border border-green-600 bg-green-50 hover:bg-green-100",
     buttonTextStyle: { color: "#1E7A47" },
   },
   blue: {
@@ -125,24 +125,13 @@ export default function ChooseReferralTypePage() {
                 </ol>
 
                 <div className="mt-auto">
-                  {pathway.href ? (
-                    <Link
-                      href={pathway.href}
-                      style={accent.buttonTextStyle}
-                      className={`flex min-h-[44px] w-full items-center justify-center rounded-md font-body text-body-md font-semibold transition-colors ${accent.buttonClass}`}
-                    >
-                      {pathway.cta}
-                    </Link>
-                  ) : (
-                    <button
-                      type="button"
-                      disabled
-                      style={accent.buttonTextStyle}
-                      className={`flex min-h-[44px] w-full cursor-not-allowed items-center justify-center rounded-md font-body text-body-md font-semibold opacity-90 transition-colors ${accent.buttonClass}`}
-                    >
-                      {pathway.cta}
-                    </button>
-                  )}
+                  <Link
+                    href={pathway.href}
+                    style={accent.buttonTextStyle}
+                    className={`flex min-h-[44px] w-full items-center justify-center rounded-md font-body text-body-md font-semibold transition-colors ${accent.buttonClass}`}
+                  >
+                    {pathway.cta}
+                  </Link>
                 </div>
               </div>
             );
