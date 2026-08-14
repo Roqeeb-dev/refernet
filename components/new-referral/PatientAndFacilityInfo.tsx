@@ -13,7 +13,7 @@ export default function PatientAndFacilityInfo({
     <div className="flex flex-col gap-base rounded-2xl border border-gray-100 bg-white p-lg shadow-xs">
       {/* PATIENT INFORMATION */}
       <div>
-        <h3 className="font-body text-caption font-bold tracking-wider text-text-disabled uppercase">
+        <h3 className="font-body text-primary font-semibold tracking-wider text-text-disabled uppercase">
           PATIENT INFORMATION
         </h3>
         <div className="mt-base grid grid-cols-[140px_1fr] gap-y-xs font-body text-body-sm">
@@ -47,7 +47,7 @@ export default function PatientAndFacilityInfo({
 
       {/* REFERRING FACILITY INFORMATION */}
       <div>
-        <h3 className="font-body text-caption font-bold tracking-wider text-text-disabled uppercase">
+        <h3 className="font-body text-primary font-semibold tracking-wider text-text-disabled uppercase">
           REFERRING FACILITY INFORMATION
         </h3>
         <div className="mt-base grid grid-cols-[140px_1fr] gap-y-xs font-body text-body-sm">

@@ -55,7 +55,7 @@ export default function ReferralHeader({
         </p>
       </div>
 
-      <div className="flex items-center gap-sm">
+      <div className="flex flex-col items-center gap-sm">
         {isIncoming ? (
           <>
             <Button

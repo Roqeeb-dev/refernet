@@ -13,7 +13,7 @@ export default function ClinicalDetailsSection({
   return (
     <div className="flex flex-col gap-lg rounded-2xl border border-gray-100 bg-white p-lg shadow-xs">
       <div>
-        <h3 className="font-body text-caption font-bold tracking-wider text-text-disabled uppercase">
+        <h3 className="font-body text-primary font-semibold tracking-wider text-text-disabled uppercase">
           CLINICAL INFORMATION
         </h3>
 
