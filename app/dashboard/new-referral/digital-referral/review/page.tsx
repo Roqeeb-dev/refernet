@@ -66,7 +66,7 @@ export default function ReviewConfirmPage() {
       console.log("Submitting referral payload:", data);
 
       // Navigate on success
-      router.push("/dashboard/referrals");
+      router.push("/new-referral/submitted?type=digital&ref=RN-8304");
     } catch (err) {
       console.error(err);
     } finally {

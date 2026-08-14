@@ -87,7 +87,7 @@ export default function ReviewPage() {
     }
 
     reset();
-    router.push(`/dashboard/referrals/${referralId}/sent`);
+    router.push("/new-referral/submitted?type=paper&ref=RN-PAPER-8257");
   }
 
   const facilityRows = [
