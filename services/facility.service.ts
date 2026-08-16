@@ -1,8 +1,11 @@
 import { supabase } from "@/lib/supabaseClient";
-import type { FacilityAvailabilityStatus } from "@/lib/facility";
 
 export type ApprovalStatus = "pending_review" | "approved" | "rejected";
-export type AvailabilityStatus = FacilityAvailabilityStatus;
+export type AvailabilityStatus =
+  | "accepting"
+  | "limited"
+  | "emergency_only"
+  | "unavailable";
 
 export interface FacilityRegistration {
   id: string;
