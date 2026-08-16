@@ -1,10 +1,22 @@
 "use client";
 
 import React, { useState } from "react";
-import RequestDocumentsModal from "./RequestDocumentModal";
+import ApproveModal from "@/components/admin/ApproveModal";
+import RejectModal from "@/components/admin/RejectModal";
+import RequestDocumentsModal from "@/components/admin/RequestDocumentModal";
 
-export default function ReviewActionCard() {
-  const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
+interface ReviewActionCardProps {
+  facilityName?: string;
+}
+
+export default function ReviewActionCard({
+  facilityName = "Grace Medical Clinic",
+}: ReviewActionCardProps) {
+  // Modal visibility states
+  const [activeModal, setActiveModal] = useState<
+    "APPROVE" | "REJECT" | "REQUEST" | null
+  >(null);
+
   const [checklist, setChecklist] = useState({
     profileComplete: true,
     phoneUnique: true,
@@ -100,9 +112,10 @@ export default function ReviewActionCard() {
           <button
             type="button"
             disabled={!canApprove}
+            onClick={() => setActiveModal("APPROVE")}
             className={`w-full rounded-xl py-2.5 font-body text-[12px] font-bold transition-all ${
               canApprove
-                ? "bg-emerald-800 text-white hover:bg-emerald-900"
+                ? "bg-emerald-800 text-white hover:bg-emerald-900 cursor-pointer"
                 : "bg-gray-100 text-gray-400 cursor-not-allowed"
             }`}
           >
@@ -111,26 +124,39 @@ export default function ReviewActionCard() {
 
           <button
             type="button"
-            onClick={() => setIsRequestModalOpen(true)}
-            className="w-full rounded-xl bg-amber-500 py-2.5 font-body text-[12px] font-bold text-white hover:bg-amber-600 transition-colors"
+            onClick={() => setActiveModal("REQUEST")}
+            className="w-full rounded-xl bg-amber-500 py-2.5 font-body text-[12px] font-bold text-white hover:bg-amber-600 transition-colors cursor-pointer"
           >
             Request Additional Documents
           </button>
 
           <button
             type="button"
-            className="w-full rounded-xl border border-red-500 py-2.5 font-body text-[12px] font-bold text-red-600 hover:bg-red-50 transition-colors"
+            onClick={() => setActiveModal("REJECT")}
+            className="w-full rounded-xl border border-red-500 py-2.5 font-body text-[12px] font-bold text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
           >
             Reject Application
           </button>
         </div>
       </div>
 
-      {/* Linked Modal */}
+      {/* Linked Modals */}
+      <ApproveModal
+        isOpen={activeModal === "APPROVE"}
+        onClose={() => setActiveModal(null)}
+        facilityName={facilityName}
+      />
+
       <RequestDocumentsModal
-        isOpen={isRequestModalOpen}
-        onClose={() => setIsRequestModalOpen(false)}
-        facilityName="Grace Medical Clinic"
+        isOpen={activeModal === "REQUEST"}
+        onClose={() => setActiveModal(null)}
+        facilityName={facilityName}
+      />
+
+      <RejectModal
+        isOpen={activeModal === "REJECT"}
+        onClose={() => setActiveModal(null)}
+        facilityName={facilityName}
       />
     </>
   );
