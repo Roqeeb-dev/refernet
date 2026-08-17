@@ -126,3 +126,6 @@ export async function updateFacilityAvailability(
 
   return { data: data as FacilityRegistration, error: null };
 }
+
+// Alias to match store calls directly
+export const updateFacilityStatus = updateFacilityAvailability;

@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Bell, Menu, User } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useFacility } from "@/hooks/useFacility";
 import {
   getFacilityAvailabilityOption,
   type FacilityAvailabilityStatus,
@@ -22,21 +23,34 @@ export default function Topbar({
   onMenuClick,
   hasNotifications = true,
 }: TopbarProps) {
-  const { user, loading } = useAuth();
-  const initials = user?.email ? user.email.charAt(0).toUpperCase() : null;
+  const { user, loading: authLoading } = useAuth();
+  const {
+    facility,
+    updateStatus,
+    isLoading: facilityLoading,
+    isUpdatingStatus,
+  } = useFacility();
 
-  // Shared with dashboard/page.tsx's Quick Actions "Update Status" — both
-  // read/write the same store now, so neither can go stale relative to
-  // the other.
-  const { status, lastUpdated, setStatus } = useFacilityStatusStore();
+  const initials = user?.email ? user.email.charAt(0).toUpperCase() : null;
+  const { status, lastUpdated } = useFacilityStatusStore();
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
 
-  const statusOption = getFacilityAvailabilityOption(status);
+  // Fallback to Zustand state or backend state
+  const currentStatus = status ?? facility?.availability_status ?? "accepting";
+  const statusOption = getFacilityAvailabilityOption(currentStatus);
 
-  function handleSaveStatus(newStatus: FacilityAvailabilityStatus) {
-    setStatus(newStatus);
+  async function handleSaveStatus(newStatus: FacilityAvailabilityStatus) {
+    const { error } = await updateStatus(newStatus);
+
+    if (error) {
+      window.alert(`Couldn't update facility status: ${error}`);
+      return;
+    }
+
     setIsStatusModalOpen(false);
   }
+
+  const isLoading = authLoading || facilityLoading;
 
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between border-b border-gray-200 bg-white px-base py-sm md:px-xl">
@@ -53,7 +67,9 @@ export default function Topbar({
         <div className="min-w-0">
           <p className="truncate font-body text-body-md text-text-primary">
             Welcome back,{" "}
-            <span className="font-semibold text-green-700">{facilityName}</span>
+            <span className="font-semibold text-green-700">
+              {facility?.facility_name || facilityName}
+            </span>
           </p>
           <p className="font-body text-caption text-text-secondary">
             Status updated at {lastUpdated}
@@ -73,10 +89,11 @@ export default function Topbar({
           </span>
           <button
             type="button"
+            disabled={isUpdatingStatus}
             onClick={() => setIsStatusModalOpen(true)}
-            className={`ml-xs font-body text-caption font-semibold underline underline-offset-2 transition-colors hover:opacity-80 ${statusOption.textColor}`}
+            className={`ml-xs font-body text-caption font-semibold underline underline-offset-2 transition-colors hover:opacity-80 disabled:opacity-50 ${statusOption.textColor}`}
           >
-            Edit
+            {isUpdatingStatus ? "Saving..." : "Edit"}
           </button>
         </div>
 
@@ -91,7 +108,7 @@ export default function Topbar({
           )}
         </button>
 
-        {loading ? (
+        {isLoading ? (
           <div className="h-9 w-9 animate-pulse rounded-full bg-gray-200" />
         ) : (
           <Link
@@ -106,7 +123,7 @@ export default function Topbar({
 
       <UpdateFacilityStatusModal
         open={isStatusModalOpen}
-        currentStatus={status}
+        currentStatus={currentStatus}
         onClose={() => setIsStatusModalOpen(false)}
         onSave={handleSaveStatus}
       />

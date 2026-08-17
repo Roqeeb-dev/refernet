@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 import {
   getMyFacility,
-  updateFacilityAvailability,
   type FacilityRegistration,
 } from "@/services/facility.service";
 import type { FacilityAvailabilityStatus as AvailabilityStatus } from "@/lib/facility";
+import { useFacilityStatusStore } from "@/store/useFacilityStatusStore";
 
 interface UseFacilityResult {
   facility: FacilityRegistration | null;
@@ -13,7 +13,6 @@ interface UseFacilityResult {
   refetch: () => Promise<void>;
   updateStatus: (
     status: AvailabilityStatus,
-    note?: string,
   ) => Promise<{ error: string | null }>;
   isUpdatingStatus: boolean;
 }
@@ -22,43 +21,45 @@ export function useFacility(): UseFacilityResult {
   const [facility, setFacility] = useState<FacilityRegistration | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+
+  const { initializeStatus, saveStatus, isUpdating } = useFacilityStatusStore();
 
   const fetchFacility = useCallback(async () => {
     setIsLoading(true);
     const { data, error: fetchError } = await getMyFacility();
     setFacility(data);
     setError(fetchError);
+
+    // Sync backend state into store on initial load
+    if (data?.availability_status) {
+      initializeStatus(data.availability_status, data.availability_updated_at);
+    }
+
     setIsLoading(false);
-  }, []);
+  }, [initializeStatus]);
 
   useEffect(() => {
     fetchFacility();
   }, [fetchFacility]);
 
   const updateStatus = useCallback(
-    async (status: AvailabilityStatus, note?: string) => {
-      if (!facility) {
+    async (status: AvailabilityStatus) => {
+      if (!facility?.id) {
         return { error: "No facility loaded yet." };
       }
 
-      setIsUpdatingStatus(true);
-      const { data, error: updateError } = await updateFacilityAvailability(
-        facility.id,
-        status,
-        note,
-      );
-      setIsUpdatingStatus(false);
+      // Delegate persistence and state update to the Zustand store
+      const result = await saveStatus(facility.id, status);
 
-      if (updateError) {
-        return { error: updateError };
+      if (!result.error) {
+        setFacility((prev) =>
+          prev ? { ...prev, availability_status: status } : null,
+        );
       }
 
-      // Reflect the confirmed server state, not an optimistic guess.
-      setFacility(data);
-      return { error: null };
+      return result;
     },
-    [facility],
+    [facility?.id, saveStatus],
   );
 
   return {
@@ -67,6 +68,6 @@ export function useFacility(): UseFacilityResult {
     error,
     refetch: fetchFacility,
     updateStatus,
-    isUpdatingStatus,
+    isUpdatingStatus: isUpdating,
   };
 }
