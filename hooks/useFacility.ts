@@ -1,9 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
 import {
+  fetchFacilities,
   getMyFacility,
   type FacilityRegistration,
 } from "@/services/facility.service";
-import type { FacilityAvailabilityStatus as AvailabilityStatus } from "@/lib/facility";
+import type {
+  Facility,
+  FacilityAvailabilityStatus as AvailabilityStatus,
+} from "@/lib/facility";
 import { useFacilityStatusStore } from "@/store/useFacilityStatusStore";
 
 interface UseFacilityResult {
@@ -17,6 +21,16 @@ interface UseFacilityResult {
   isUpdatingStatus: boolean;
 }
 
+interface UseFacilitiesResult {
+  facilities: Facility[];
+  isLoading: boolean;
+  error: string | null;
+  refetch: () => Promise<void>;
+}
+
+/**
+ * Hook to fetch and manage the current user's registered facility profile and availability
+ */
 export function useFacility(): UseFacilityResult {
   const [facility, setFacility] = useState<FacilityRegistration | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -69,5 +83,38 @@ export function useFacility(): UseFacilityResult {
     refetch: fetchFacility,
     updateStatus,
     isUpdatingStatus: isUpdating,
+  };
+}
+
+export function useFacilities(): UseFacilitiesResult {
+  const [facilities, setFacilities] = useState<Facility[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadFacilities = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+
+    const { data, error: fetchError } = await fetchFacilities();
+
+    if (fetchError) {
+      setError(fetchError);
+      setFacilities([]);
+    } else {
+      setFacilities(data ?? []);
+    }
+
+    setIsLoading(false);
+  }, []);
+
+  useEffect(() => {
+    loadFacilities();
+  }, [loadFacilities]);
+
+  return {
+    facilities,
+    isLoading,
+    error,
+    refetch: loadFacilities,
   };
 }

@@ -2,17 +2,13 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Search } from "lucide-react";
+import { Search, Loader2 } from "lucide-react";
 import Button from "@/components/shared/Button";
 import FacilityCard from "@/components/new-referral/FacilityCard";
 import EmptyFacilityState from "@/components/new-referral/EmptyFacilityState";
 import { FACILITY_TYPE_OPTIONS } from "@/lib/facility";
 import { usePaperReferralDraftStore } from "@/store/useDraftId";
-import { MOCK_FACILITIES } from "@/lib/data";
-
-const STATES = Array.from(
-  new Set(MOCK_FACILITIES.map((f) => f.address.split(",").pop()!.trim())),
-);
+import { useFacilities } from "@/hooks/useFacility";
 
 export default function SelectFacilityPage() {
   const router = useRouter();
@@ -20,15 +16,27 @@ export default function SelectFacilityPage() {
     (s) => s.setReceivingFacility,
   );
 
+  const { facilities, isLoading: loading, error } = useFacilities();
+
   const [search, setSearch] = useState("");
   const [stateFilter, setStateFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
+  const states = useMemo(() => {
+    return Array.from(
+      new Set(
+        facilities
+          .map((f) => f.address.split(",").pop()?.trim())
+          .filter(Boolean) as string[],
+      ),
+    );
+  }, [facilities]);
+
   const filteredFacilities = useMemo(() => {
     const query = search.trim().toLowerCase();
 
-    return MOCK_FACILITIES.filter((facility) => {
+    return facilities.filter((facility) => {
       const matchesSearch =
         !query ||
         facility.name.toLowerCase().includes(query) ||
@@ -41,7 +49,7 @@ export default function SelectFacilityPage() {
 
       return matchesSearch && matchesState && matchesType;
     });
-  }, [search, stateFilter, typeFilter]);
+  }, [facilities, search, stateFilter, typeFilter]);
 
   function clearFilters() {
     setSearch("");
@@ -50,7 +58,7 @@ export default function SelectFacilityPage() {
   }
 
   function handleNext() {
-    const facility = MOCK_FACILITIES.find((f) => f.id === selectedId);
+    const facility = facilities.find((f) => f.id === selectedId);
     if (!facility) return;
     setReceivingFacility(facility);
     router.push("/dashboard/new-referral/paper-bridge/review");
@@ -81,7 +89,7 @@ export default function SelectFacilityPage() {
           className="h-tap-preferred w-full rounded-md border border-gray-200 bg-white px-base font-body text-body-sm text-text-primary focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500"
         >
           <option value="all">All States</option>
-          {STATES.map((state) => (
+          {states.map((state) => (
             <option key={state} value={state}>
               {state}
             </option>
@@ -102,21 +110,39 @@ export default function SelectFacilityPage() {
         </select>
       </div>
 
-      {/* Results */}
-      <div className="grid gap-base sm:grid-cols-2">
-        {filteredFacilities.length > 0 ? (
-          filteredFacilities.map((facility) => (
-            <FacilityCard
-              key={facility.id}
-              facility={facility}
-              selected={facility.id === selectedId}
-              onSelect={setSelectedId}
-            />
-          ))
-        ) : (
-          <EmptyFacilityState onClearFilters={clearFilters} />
-        )}
-      </div>
+      {/* Error state */}
+      {error && (
+        <div className="rounded-md border border-red-200 bg-red-50 p-base text-body-sm text-red-700">
+          Failed to load facilities: {error}
+        </div>
+      )}
+
+      {/* Results / Loading / Empty */}
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-12 gap-sm text-text-secondary">
+          <Loader2 className="h-6 w-6 animate-spin text-green-600" />
+          <p className="font-body text-body-sm">
+            Loading registered facilities...
+          </p>
+        </div>
+      ) : (
+        <div className="grid gap-base sm:grid-cols-2">
+          {filteredFacilities.length > 0 ? (
+            filteredFacilities.map((facility) => (
+              <FacilityCard
+                key={facility.id}
+                facility={facility}
+                selected={facility.id === selectedId}
+                onSelect={setSelectedId}
+              />
+            ))
+          ) : (
+            <div className="sm:col-span-2">
+              <EmptyFacilityState onClearFilters={clearFilters} />
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Footer actions */}
       <div className="mt-base flex flex-wrap items-center justify-between gap-sm">
@@ -126,7 +152,7 @@ export default function SelectFacilityPage() {
         <Button
           variant="primary"
           type="button"
-          disabled={!selectedId}
+          disabled={!selectedId || loading}
           onClick={handleNext}
         >
           Next Step
