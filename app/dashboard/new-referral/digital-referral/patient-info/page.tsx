@@ -181,7 +181,7 @@ export default function PatientInfoPage() {
       <hr className="my-xs border-gray-100" />
 
       {/* Referring Facility Section -- pulled live from the signed-in
-          facility, not stored in the draft (not user-editable). */}
+          facility */}
       <div className="flex flex-col gap-xs">
         <span className="font-body text-caption font-bold tracking-wider text-green-600 uppercase">
           REFERRING FACILITY (AUTO-POPULATED)
@@ -220,7 +220,7 @@ export default function PatientInfoPage() {
         <Button
           type="button"
           variant="outline"
-          onClick={() => router.push("/new-referral")}
+          onClick={() => router.push("/dashboard/new-referral/type")}
         >
           Change Type
         </Button>

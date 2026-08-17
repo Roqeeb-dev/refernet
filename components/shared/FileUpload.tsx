@@ -12,6 +12,7 @@ type UploadStatus = "idle" | "uploading" | "success" | "error";
 interface FileUploadProps {
   label: string;
   required?: boolean;
+  bucket?: string;
   folder: string;
   value?: string;
   onUploadComplete: (path: string) => void;
@@ -20,6 +21,7 @@ interface FileUploadProps {
 export default function FileUpload({
   label,
   required = false,
+  bucket = "facility-documents",
   folder,
   value,
   onUploadComplete,
@@ -40,12 +42,13 @@ export default function FileUpload({
     setFileName(file.name);
 
     if (value) {
-      await deleteFacilityDocument(value);
+      await deleteFacilityDocument(value, bucket);
     }
 
     const { path, error: uploadError } = await uploadFacilityDocument(
       file,
       folder,
+      bucket,
     );
 
     if (uploadError || !path) {
@@ -60,7 +63,7 @@ export default function FileUpload({
 
   function handleRemove(e: React.MouseEvent) {
     e.stopPropagation();
-    if (value) deleteFacilityDocument(value);
+    if (value) deleteFacilityDocument(value, bucket);
     setStatus("idle");
     setFileName("");
     setError(null);

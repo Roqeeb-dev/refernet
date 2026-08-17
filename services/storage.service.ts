@@ -24,44 +24,51 @@ export function validateDocumentFile(file: File): string | null {
   return null;
 }
 
+export async function uploadToBucket(
+  file: File,
+  bucketName: string,
+  folderPath: string,
+) {
+  const fileExt = file.name.split(".").pop();
+  const fileName = `${crypto.randomUUID()}-${file.name}`;
+  const filePath = `${folderPath}/${fileName}`;
+
+  const { data, error } = await supabase.storage
+    .from(bucketName)
+    .upload(filePath, file, { upsert: true });
+
+  if (error) return { path: null, error: error.message };
+  return { path: data.path, error: null };
+}
+
+export async function deleteFromBucket(bucketName: string, path: string) {
+  const { error } = await supabase.storage.from(bucketName).remove([path]);
+  if (error) console.error("Failed to delete file:", error.message);
+}
+
 export async function uploadFacilityDocument(
   file: File,
   folder: string,
-): Promise<UploadResult> {
-  const validationError = validateDocumentFile(file);
-  if (validationError) {
-    return { path: null, error: validationError };
-  }
+  bucket: string = "facility-documents",
+) {
+  const fileExt = file.name.split(".").pop();
+  const fileName = `${crypto.randomUUID()}-${file.name}`;
+  const filePath = `${folder}/${fileName}`;
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data, error } = await supabase.storage
+    .from(bucket)
+    .upload(filePath, file, { upsert: true });
 
-  if (!user) {
-    return {
-      path: null,
-      error: "You must be signed in to upload documents.",
-    };
-  }
-
-  const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
-  const path = `${folder}/${user.id}/${crypto.randomUUID()}-${safeName}`;
-
-  const { error } = await supabase.storage.from(BUCKET).upload(path, file, {
-    cacheControl: "3600",
-    upsert: false,
-  });
-
-  if (error) {
-    return { path: null, error: error.message };
-  }
-
-  return { path, error: null };
+  if (error) return { path: null, error: error.message };
+  return { path: data.path, error: null };
 }
 
-/** cleanup when a document is replaced or a step is abandoned. */
-export async function deleteFacilityDocument(path: string): Promise<void> {
-  await supabase.storage.from(BUCKET).remove([path]);
+export async function deleteFacilityDocument(
+  path: string,
+  bucket: string = "facility-documents",
+) {
+  const { error } = await supabase.storage.from(bucket).remove([path]);
+  if (error) console.error("Failed to delete file:", error.message);
 }
 
 /** Short-lived signed URL for actually viewing a document */

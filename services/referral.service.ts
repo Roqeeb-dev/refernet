@@ -135,6 +135,15 @@ export async function getReferralById(
     ? data.receiving_facility[0]
     : data.receiving_facility;
 
+  // Resolve storage path to a usable Supabase URL
+  let fileUrl = "";
+  if (data.document_path) {
+    const { data: publicUrlData } = supabase.storage
+      .from("paper-referrals")
+      .getPublicUrl(data.document_path);
+    fileUrl = publicUrlData.publicUrl;
+  }
+
   const formattedData: DetailedReferral = {
     id: data.id,
     referenceNumber: data.reference_number ?? `RN-${data.id.slice(0, 4)}`,
@@ -153,17 +162,17 @@ export async function getReferralById(
     },
 
     patient: {
-      fullName: patient?.full_name ?? "Unknown Patient",
-      age: `${patient?.age ?? 0} years`,
+      fullName: patient?.full_name ?? "Paper Form Attachment",
+      age: patient?.age ? `${patient.age} years` : "N/A",
       sex: formatGender(patient?.sex),
       phone: patient?.phone ?? "N/A",
       nhiaNumber: patient?.nhia_number ?? "N/A",
     },
 
     clinical: {
-      chiefComplaint: data.chief_complaint ?? "",
-      diagnosis: data.diagnosis ?? "",
-      clinicalHistory: data.clinical_history ?? "",
+      chiefComplaint: data.chief_complaint ?? "Refer to attached document",
+      diagnosis: data.diagnosis ?? "Refer to attached document",
+      clinicalHistory: data.clinical_history ?? "Refer to attached document",
       vitals: {
         bp: data.bp ?? "--",
         hr: data.hr ?? "--",
@@ -178,8 +187,13 @@ export async function getReferralById(
       additionalNotes: data.additional_notes ?? "",
     },
 
-    attachments: data.document_path
-      ? [{ name: "Document Attachment", url: data.document_path }]
+    attachments: fileUrl
+      ? [
+          {
+            name: extractFileName(data.document_path),
+            url: fileUrl,
+          },
+        ]
       : [],
 
     timeline: [
@@ -192,6 +206,12 @@ export async function getReferralById(
   };
 
   return { data: formattedData, error: null };
+}
+
+function extractFileName(path: string): string {
+  if (!path) return "Attachment.pdf";
+  const file = path.split("/").pop() ?? path;
+  return file.includes("-") ? file.split("-").slice(1).join("-") : file;
 }
 
 // Map database status to table display status
@@ -287,8 +307,8 @@ export async function getIncomingReferrals(): Promise<{
     id: item.id,
     reference: item.reference_number ?? `RN-${item.id.slice(0, 4)}`,
     facilityName: item.referring_facility?.facility_name ?? "Unknown Facility",
-    patientName: item.patients?.full_name ?? "Unknown Patient",
-    patientAge: item.patients?.age ?? 0,
+    patientName: item.patients?.full_name ?? "Paper Referral",
+    patientAge: item.patients?.age ?? "--",
     patientGender: formatGender(item.patients?.sex),
     urgency: mapUrgency(item.urgency_level),
     status: mapStatus(item.status),
@@ -339,8 +359,8 @@ export async function getOutgoingReferrals(): Promise<{
     id: item.id,
     reference: item.reference_number ?? `RN-${item.id.slice(0, 4)}`,
     facilityName: item.receiving_facility?.facility_name ?? "Unknown Facility",
-    patientName: item.patients?.full_name ?? "Unknown Patient",
-    patientAge: item.patients?.age ?? 0,
+    patientName: item.patients?.full_name ?? "Paper Referral",
+    patientAge: item.patients?.age ?? "--",
     patientGender: formatGender(item.patients?.sex),
     urgency: mapUrgency(item.urgency_level),
     status: mapStatus(item.status),
@@ -367,7 +387,6 @@ export async function acceptReferral(
     return { data: null, error: error.message };
   }
 
-  // Refetch and return updated detailed referral object
   return getReferralById(referralId);
 }
 
@@ -388,10 +407,9 @@ export async function declineReferral(
     decline_action_type: actionType,
   };
 
-  // If re-referring to a new facility, update the receiving facility pointer
   if (actionType === "re-refer" && targetFacilityId) {
     updatePayload.receiving_facility_id = targetFacilityId;
-    updatePayload.status = "pending"; // Reset status to pending for the new facility
+    updatePayload.status = "pending";
   }
 
   const { error } = await supabase
@@ -403,6 +421,5 @@ export async function declineReferral(
     return { data: null, error: error.message };
   }
 
-  // Refetch and return updated detailed referral object
   return getReferralById(referralId);
 }

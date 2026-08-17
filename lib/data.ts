@@ -85,7 +85,7 @@ export const DASHBOARD_RECENT_OUTGOING = [
 
 export const MOCK_FACILITIES: Facility[] = [
   {
-    id: "1",
+    id: "a1b2c3d4-e5f6-4a5b-8c9d-012345678901",
     name: "Lagos Island General Hospital",
     type: "general_hospital",
     distanceKm: 2.3,
@@ -94,7 +94,7 @@ export const MOCK_FACILITIES: Facility[] = [
     status: "accepting",
   },
   {
-    id: "2",
+    id: "a1b2c3d4-e5f6-4a5b-8c9d-012345678902",
     name: "Lagos University Teaching Hospital",
     type: "tertiary_hospital",
     distanceKm: 5.1,
@@ -104,7 +104,7 @@ export const MOCK_FACILITIES: Facility[] = [
     note: "Limited beds — confirm before sending",
   },
   {
-    id: "3",
+    id: "a1b2c3d4-e5f6-4a5b-8c9d-012345678903",
     name: "Reddington Hospital",
     type: "specialist_hospital",
     distanceKm: 8.7,
@@ -114,7 +114,7 @@ export const MOCK_FACILITIES: Facility[] = [
     note: "Only emergency cases accepted",
   },
   {
-    id: "4",
+    id: "a1b2c3d4-e5f6-4a5b-8c9d-012345678904",
     name: "St Nicholas Hospital",
     type: "specialist_hospital",
     distanceKm: 12.4,
@@ -123,7 +123,7 @@ export const MOCK_FACILITIES: Facility[] = [
     status: "accepting",
   },
   {
-    id: "5",
+    id: "a1b2c3d4-e5f6-4a5b-8c9d-012345678905",
     name: "UCH — University College Hospital",
     type: "tertiary_hospital",
     distanceKm: 134,
@@ -132,7 +132,7 @@ export const MOCK_FACILITIES: Facility[] = [
     status: "unavailable",
   },
   {
-    id: "6",
+    id: "a1b2c3d4-e5f6-4a5b-8c9d-012345678906",
     name: "Eko Hospital",
     type: "specialist_hospital",
     distanceKm: 3.9,
