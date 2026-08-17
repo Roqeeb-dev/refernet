@@ -4,15 +4,30 @@ import { useState } from "react";
 import Button from "@/components/shared/Button";
 import UpdateFacilityStatusModal from "@/components/dashboard/UpdateFacilityStatusModal";
 import { useFacilityStatusStore } from "@/store/useFacilityStatusStore";
-import { getFacilityStatusOption } from "@/lib/facilityStatus";
+import { useFacility } from "@/hooks/useFacility";
+import {
+  getFacilityAvailabilityOption,
+  type FacilityAvailabilityStatus,
+} from "@/lib/facility";
 
 export default function CurrentStatusCard() {
   const status = useFacilityStatusStore((s) => s.status);
   const lastUpdated = useFacilityStatusStore((s) => s.lastUpdated);
-  const setStatus = useFacilityStatusStore((s) => s.setStatus);
+  const { updateStatus, isUpdatingStatus } = useFacility();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const statusOption = getFacilityStatusOption(status);
+  const statusOption = getFacilityAvailabilityOption(status);
+
+  async function handleSaveStatus(newStatus: FacilityAvailabilityStatus) {
+    const { error } = await updateStatus(newStatus);
+
+    if (error) {
+      window.alert(`Couldn't update status: ${error}`);
+      return;
+    }
+
+    setIsModalOpen(false);
+  }
 
   return (
     <div className="rounded-lg border border-gray-100 bg-white p-lg">
@@ -43,7 +58,11 @@ export default function CurrentStatusCard() {
           </div>
         </div>
 
-        <Button variant="outline" onClick={() => setIsModalOpen(true)}>
+        <Button
+          variant="outline"
+          onClick={() => setIsModalOpen(true)}
+          isLoading={isUpdatingStatus}
+        >
           Update Status
         </Button>
       </div>
@@ -53,10 +72,10 @@ export default function CurrentStatusCard() {
       </p>
 
       <UpdateFacilityStatusModal
-        isOpen={isModalOpen}
+        open={isModalOpen}
         currentStatus={status}
         onClose={() => setIsModalOpen(false)}
-        onSave={setStatus}
+        onSave={handleSaveStatus}
       />
     </div>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { RotateCcw, ArrowRightLeft } from "lucide-react";
 import Button from "@/components/shared/Button";
 import FacilitySelector, { Facility } from "./FacilitySelector";
@@ -12,11 +12,12 @@ interface DeclineReferralModalProps {
   patientName: string;
   referenceNumber: string;
   referringFacilityName: string;
-  onCompleteDecline?: (payload: {
-    reason: string;
-    actionType: "return" | "re-refer";
-    targetFacility?: Facility;
-  }) => void;
+  onConfirm: (
+    reason: string,
+    actionType: "return" | "re-refer",
+    targetFacilityId?: string,
+  ) => Promise<void>;
+  isSubmitting?: boolean;
 }
 
 export default function DeclineReferralModal({
@@ -25,16 +26,14 @@ export default function DeclineReferralModal({
   patientName,
   referenceNumber,
   referringFacilityName,
-  onCompleteDecline,
+  onConfirm,
+  isSubmitting = false,
 }: DeclineReferralModalProps) {
   const [reason, setReason] = useState("");
   const [nextAction, setNextAction] = useState<"return" | "re-refer">("return");
   const [selectedFacility, setSelectedFacility] = useState<
     Facility | undefined
   >();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Controls post-decline success modal view
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   if (!isOpen) return null;
@@ -44,21 +43,11 @@ export default function DeclineReferralModal({
     isSubmitting || !reason.trim() || (isReRefer && !selectedFacility);
 
   const handleSubmit = async () => {
-    setIsSubmitting(true);
     try {
-      // Execute parent callback or API call
-      if (onCompleteDecline) {
-        await onCompleteDecline({
-          reason,
-          actionType: nextAction,
-          targetFacility: selectedFacility,
-        });
-      }
+      await onConfirm(reason, nextAction, selectedFacility?.id);
       setShowSuccessModal(true);
     } catch (err) {
       console.error(err);
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -67,7 +56,6 @@ export default function DeclineReferralModal({
     onClose();
   };
 
-  // Render Success State Dialog
   if (showSuccessModal) {
     return (
       <DeclineSuccessModal
@@ -86,12 +74,10 @@ export default function DeclineReferralModal({
           Decline Referral
         </h2>
 
-        {/* Patient Summary Header Tag */}
         <div className="mt-base rounded-xl bg-red-50/60 p-sm border border-red-100 font-body text-body-xs font-bold text-red-800">
           {patientName} · {referenceNumber}
         </div>
 
-        {/* Reason Textarea */}
         <div className="mt-base flex flex-col gap-xs">
           <label className="font-body text-caption font-bold text-text-primary">
             Reason for declining
@@ -100,19 +86,17 @@ export default function DeclineReferralModal({
             rows={3}
             value={reason}
             onChange={(e) => setReason(e.target.value)}
-            placeholder="Explain why you are unable to accept this referral. This will be shared with the referring facility."
-            className="w-full rounded-xl border border-gray-200 p-sm font-body text-body-xs text-text-primary placeholder:text-text-disabled focus:border-red-400 focus:outline-none focus:ring-1 focus:ring-red-400"
+            placeholder="Explain why you are unable to accept this referral."
+            className="w-full rounded-xl border border-gray-200 p-sm font-body text-body-xs text-text-primary focus:border-red-400 focus:outline-none"
           />
         </div>
 
-        {/* What Happens Next Section */}
         <div className="mt-base flex flex-col gap-xs">
           <label className="font-body text-caption font-bold text-text-primary">
             What happens next for the patient?
           </label>
 
           <div className="flex flex-col gap-sm">
-            {/* Action 1: Return to Referring Facility */}
             <div
               onClick={() => setNextAction("return")}
               className={`flex cursor-pointer items-start gap-sm rounded-xl border p-sm transition-all ${
@@ -129,7 +113,7 @@ export default function DeclineReferralModal({
                   Return to {referringFacilityName}
                 </p>
                 <p className="font-body text-caption text-text-disabled">
-                  Patient is sent back to the referring facility
+                  Patient is sent back to referring facility
                 </p>
               </div>
               <input
@@ -141,7 +125,6 @@ export default function DeclineReferralModal({
               />
             </div>
 
-            {/* Action 2: Refer to Another Facility */}
             <div
               onClick={() => setNextAction("re-refer")}
               className={`flex cursor-pointer items-start gap-sm rounded-xl border p-sm transition-all ${
@@ -158,7 +141,7 @@ export default function DeclineReferralModal({
                   Refer to Another Facility
                 </p>
                 <p className="font-body text-caption text-text-disabled">
-                  You select a suitable facility and initiate a new referral
+                  Initiate a new referral to another facility
                 </p>
               </div>
               <input
@@ -172,7 +155,6 @@ export default function DeclineReferralModal({
           </div>
         </div>
 
-        {/* CONDITIONAL FACILITY SELECTOR */}
         {isReRefer && (
           <FacilitySelector
             selectedFacilityId={selectedFacility?.id}
@@ -180,7 +162,6 @@ export default function DeclineReferralModal({
           />
         )}
 
-        {/* Modal Buttons */}
         <div className="mt-lg flex items-center justify-end gap-sm">
           <Button
             variant="outline"

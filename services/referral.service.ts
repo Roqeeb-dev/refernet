@@ -2,6 +2,7 @@ import { supabase } from "@/lib/supabaseClient";
 import type { Facility } from "@/lib/facility";
 import { getMyFacilityId } from "@/lib/getMyFacilityId";
 import type { ReferralRow } from "@/components/dashboard/ReferralsTable";
+import type { DetailedReferral } from "@/lib/referral-types";
 
 export interface SubmitPaperReferralInput {
   documentPath: string;
@@ -66,21 +67,14 @@ export async function submitPaperReferral(
   };
 }
 
-export interface ReferralDetail {
-  id: string;
-  referenceNumber: string;
-  documentPath: string | null;
-  status: string;
-  submittedAt: string;
-  receivingFacility: {
-    id: string;
-    name: string;
-  };
+export interface GetReferralByIdResult {
+  data: DetailedReferral | null;
+  error: string | null;
 }
 
 export async function getReferralById(
   id: string,
-): Promise<ReferralDetail | null> {
+): Promise<GetReferralByIdResult> {
   const { data, error } = await supabase
     .from("referrals")
     .select(
@@ -89,29 +83,115 @@ export async function getReferralById(
       reference_number,
       document_path,
       status,
+      urgency_level,
       created_at,
+      chief_complaint,
+      diagnosis,
+      clinical_history,
+      current_medications,
+      previous_medications,
+      interventions,
+      reason_for_referral,
+      additional_notes,
+      bp,
+      hr,
+      temp,
+      rr,
+      spo2,
+      patients!patient_id (
+        full_name,
+        age,
+        sex,
+        phone,
+        nhia_number
+      ),
+      referring_facility:facility_registrations!referring_facility_id (
+        facility_name,
+        phone_number
+      ),
       receiving_facility:facility_registrations!receiving_facility_id (
-        id,
-        facility_name
+        facility_name,
+        phone_number
       )
     `,
     )
     .eq("id", id)
     .single();
 
-  if (error || !data) return null;
+  if (error || !data) {
+    return {
+      data: null,
+      error: error?.message ?? "Referral not found.",
+    };
+  }
 
-  return {
+  const patient = Array.isArray(data.patients)
+    ? data.patients[0]
+    : data.patients;
+  const refFacility = Array.isArray(data.referring_facility)
+    ? data.referring_facility[0]
+    : data.referring_facility;
+  const recFacility = Array.isArray(data.receiving_facility)
+    ? data.receiving_facility[0]
+    : data.receiving_facility;
+
+  const formattedData: DetailedReferral = {
     id: data.id,
-    referenceNumber: data.reference_number,
-    documentPath: data.document_path,
-    status: data.status,
-    submittedAt: data.created_at,
-    receivingFacility: {
-      id: (data.receiving_facility as any).id,
-      name: (data.receiving_facility as any).facility_name,
+    referenceNumber: data.reference_number ?? `RN-${data.id.slice(0, 4)}`,
+    direction: "incoming",
+    status: data.status ?? "New",
+    urgency: data.urgency_level ?? "Routine",
+    receivedTime: formatReceivedAt(data.created_at),
+
+    referringFacility: {
+      name: refFacility?.facility_name ?? "Unknown Facility",
+      phone: refFacility?.phone_number ?? "N/A",
     },
+    receivingFacility: {
+      name: recFacility?.facility_name ?? "Unknown Facility",
+      phone: recFacility?.phone_number ?? "N/A",
+    },
+
+    patient: {
+      fullName: patient?.full_name ?? "Unknown Patient",
+      age: `${patient?.age ?? 0} years`,
+      sex: formatGender(patient?.sex),
+      phone: patient?.phone ?? "N/A",
+      nhiaNumber: patient?.nhia_number ?? "N/A",
+    },
+
+    clinical: {
+      chiefComplaint: data.chief_complaint ?? "",
+      diagnosis: data.diagnosis ?? "",
+      clinicalHistory: data.clinical_history ?? "",
+      vitals: {
+        bp: data.bp ?? "--",
+        hr: data.hr ?? "--",
+        temp: data.temp ?? "--",
+        rr: data.rr ?? "--",
+        spO2: data.spo2 ?? "--",
+      },
+      currentMeds: data.current_medications ?? "",
+      previousMeds: data.previous_medications ?? "",
+      interventions: data.interventions ?? "",
+      reasonForReferral: data.reason_for_referral ?? "",
+      additionalNotes: data.additional_notes ?? "",
+    },
+
+    attachments: data.document_path
+      ? [{ name: "Document Attachment", url: data.document_path }]
+      : [],
+
+    timeline: [
+      {
+        title: "Sent by referring facility",
+        time: formatReceivedAt(data.created_at),
+        status: "completed",
+      },
+    ],
   };
+
+  return { data: formattedData, error: null };
 }
 
 // Map database status to table display status
@@ -160,7 +240,7 @@ function formatReceivedAt(createdAt: string): string {
 
 // Helper to format gender/sex field to match ReferralRow patientGender type
 function formatGender(sex: string | null): "Male" | "Female" {
-  if (!sex) return "Male"; // Or set your default preferred fallback
+  if (!sex) return "Male";
   const normalized = sex.toLowerCase();
   if (normalized === "female") return "Female";
   return "Male";
@@ -268,4 +348,61 @@ export async function getOutgoingReferrals(): Promise<{
   }));
 
   return { data: rows, error: null };
+}
+
+export interface AcceptReferralResult {
+  data: DetailedReferral | null;
+  error: string | null;
+}
+
+export async function acceptReferral(
+  referralId: string,
+): Promise<AcceptReferralResult> {
+  const { error } = await supabase
+    .from("referrals")
+    .update({ status: "accepted" })
+    .eq("id", referralId);
+
+  if (error) {
+    return { data: null, error: error.message };
+  }
+
+  // Refetch and return updated detailed referral object
+  return getReferralById(referralId);
+}
+
+export interface DeclineReferralResult {
+  data: DetailedReferral | null;
+  error: string | null;
+}
+
+export async function declineReferral(
+  referralId: string,
+  reason: string,
+  actionType: "return" | "re-refer",
+  targetFacilityId?: string,
+): Promise<DeclineReferralResult> {
+  const updatePayload: Record<string, any> = {
+    status: "declined",
+    decline_reason: reason,
+    decline_action_type: actionType,
+  };
+
+  // If re-referring to a new facility, update the receiving facility pointer
+  if (actionType === "re-refer" && targetFacilityId) {
+    updatePayload.receiving_facility_id = targetFacilityId;
+    updatePayload.status = "pending"; // Reset status to pending for the new facility
+  }
+
+  const { error } = await supabase
+    .from("referrals")
+    .update(updatePayload)
+    .eq("id", referralId);
+
+  if (error) {
+    return { data: null, error: error.message };
+  }
+
+  // Refetch and return updated detailed referral object
+  return getReferralById(referralId);
 }
