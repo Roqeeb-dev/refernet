@@ -28,41 +28,46 @@ export default function AcceptReferralModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-base backdrop-blur-xs">
-      <div className="w-full max-w-[500px] rounded-2xl bg-white p-lg shadow-xl border border-gray-100">
-        <h2 className="font-heading text-heading-xs font-bold text-text-primary">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-[2px]">
+      <div className="w-full max-w-[460px] rounded-[20px] bg-white p-6 shadow-2xl transition-all">
+        {/* Header */}
+        <h2 className="font-serif text-[22px] font-bold text-[#0F392B]">
           Accept Referral
         </h2>
+        <div className="mt-4 border-b border-gray-100" />
 
         {/* Patient Summary Card */}
-        <div className="mt-base rounded-xl bg-emerald-50/50 p-base border border-emerald-100/60">
-          <p className="font-body text-body-sm font-bold text-emerald-950">
+        <div className="mt-5 rounded-2xl bg-[#E8F5E9]/60 p-4 border border-[#C8E6C9]/60">
+          <p className="text-[15px] font-bold text-[#1B4332]">
             {patientName}, {patientAge} {patientSex}
           </p>
-          <div className="mt-xs flex items-center gap-xs">
-            <span className="rounded-full bg-red-100 px-sm py-[2px] font-body text-caption font-bold text-red-700">
-              ● {urgency}
+          <div className="mt-2 flex items-center gap-2">
+            <span className="inline-flex items-center gap-1 rounded-md bg-[#FFEBEE] px-2 py-0.5 text-xs font-semibold text-[#D32F2F] border border-[#FFCDD2]/50">
+              <span className="text-[10px]">●</span> {urgency}
             </span>
-            <span className="font-body text-caption font-medium text-emerald-800">
+            <span className="text-xs font-medium text-[#558B2F]">
               {referenceNumber}
             </span>
           </div>
         </div>
 
         {/* Confirmation Text */}
-        <p className="mt-base font-body text-body-xs text-text-secondary leading-relaxed">
+        <p className="mt-5 text-sm leading-relaxed text-[#4A5568]">
           By accepting, you confirm that your facility is able to receive and
           treat this patient. The referring facility will be notified
           immediately.
         </p>
 
+        {/* Divider */}
+        <div className="mt-6 border-b border-gray-100" />
+
         {/* Modal Actions */}
-        <div className="mt-lg flex items-center justify-end gap-sm">
+        <div className="mt-5 flex items-center justify-end gap-3">
           <Button
             variant="outline"
             onClick={onClose}
             disabled={isSubmitting}
-            className="w-full border-gray-200 text-text-primary hover:bg-gray-50"
+            className="w-full rounded-xl border border-gray-200 bg-white py-3 text-sm font-semibold text-[#4A5568] hover:bg-gray-50 hover:text-[#2D3748]"
           >
             Cancel
           </Button>
@@ -70,7 +75,7 @@ export default function AcceptReferralModal({
             variant="primary"
             onClick={onConfirm}
             disabled={isSubmitting}
-            className="w-full bg-emerald-700 hover:bg-emerald-800 text-white"
+            className="w-full rounded-xl bg-[#1B7340] py-3 text-sm font-bold text-white hover:bg-[#145A32] disabled:opacity-50"
           >
             {isSubmitting ? "Accepting..." : "Confirm Accept"}
           </Button>
