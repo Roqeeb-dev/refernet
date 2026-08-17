@@ -6,34 +6,46 @@ import { usePathname, useRouter } from "next/navigation";
 import { X, LogOut } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
-const NAV_ITEMS = [
-  { label: "Dashboard", href: "/dashboard" },
-  { label: "New Referral", href: "/dashboard/new-referral/type" },
-  { label: "Outgoing Referrals", href: "/dashboard/outgoing-referrals" },
-  {
-    label: "Incoming Referrals",
-    href: "/dashboard/incoming-referrals",
-    badge: 3,
-  },
-  { label: "Facility Profile", href: "/dashboard/profile" },
-];
-
 interface SidebarProps {
   open: boolean;
   onClose: () => void;
+  incomingCount?: number;
+  outgoingCount?: number;
 }
 
-export default function Sidebar({ open, onClose }: SidebarProps) {
+export default function Sidebar({
+  open,
+  onClose,
+  incomingCount = 0,
+  outgoingCount = 0,
+}: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { signOut } = useAuth();
   const [loggingOut, setLoggingOut] = useState(false);
+
+  const navItems = [
+    { label: "Dashboard", href: "/dashboard" },
+    { label: "New Referral", href: "/dashboard/new-referral/type" },
+    {
+      label: "Outgoing Referrals",
+      href: "/dashboard/outgoing-referrals",
+      badge: outgoingCount > 0 ? outgoingCount : null,
+    },
+    {
+      label: "Incoming Referrals",
+      href: "/dashboard/incoming-referrals",
+      badge: incomingCount > 0 ? incomingCount : null,
+    },
+    { label: "Facility Profile", href: "/dashboard/profile" },
+  ];
 
   async function handleLogout() {
     setLoggingOut(true);
     try {
       await signOut();
     } catch {
+      // Handle logout error if necessary
     } finally {
       setLoggingOut(false);
       router.push("/login");
@@ -78,7 +90,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
         </div>
 
         <nav className="flex flex-col gap-xs">
-          {NAV_ITEMS.map((item) => {
+          {navItems.map((item) => {
             const active =
               item.href === "/dashboard"
                 ? pathname === "/dashboard"

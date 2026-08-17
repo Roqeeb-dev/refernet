@@ -24,7 +24,7 @@ export default function UploadPaperReferral() {
 
   function handleNext() {
     if (!canContinue) return;
-    router.push("/dashboard/referrals/new/paper-bridge/select-facility");
+    router.push("/dashboard/new-referral/paper-bridge/select-facility");
   }
 
   return (
@@ -70,7 +70,8 @@ export default function UploadPaperReferral() {
           <FileUpload
             label="Upload Your Completed Form"
             required
-            folder={`paper-referrals/${draftReferralId}`}
+            bucket="paper-referrals"
+            folder={draftReferralId}
             value={documentPath}
             onUploadComplete={setDocumentPath}
           />

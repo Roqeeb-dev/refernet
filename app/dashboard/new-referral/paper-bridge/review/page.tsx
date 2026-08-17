@@ -10,11 +10,9 @@ import type { Facility } from "@/lib/facility";
 
 const isDev = process.env.NODE_ENV === "development";
 
-const FALLBACK_DOCUMENT_PATH =
-  "paper-referrals/dev/00000000-0000-0000-0000-000000000000-sample-referral.pdf";
-
+// Ensure this UUID exists in your development facility_registrations table if testing with fallbacks
 const FALLBACK_FACILITY: Facility = {
-  id: "dev-fallback-facility",
+  id: "00000000-0000-0000-0000-000000000004",
   name: "Lagos Island General Hospital",
   type: "general_hospital",
   address: "Lagos Island, Lagos",
@@ -23,11 +21,13 @@ const FALLBACK_FACILITY: Facility = {
   updatedMinutesAgo: 2,
 };
 
+const FALLBACK_DOCUMENT_PATH =
+  "dev/00000000-0000-0000-0000-000000000000-sample-referral.pdf";
+
 function extractFileName(path: string): string {
   if (!path) return "No file uploaded";
   const withoutFolder = path.split("/").pop() ?? path;
   const parts = withoutFolder.split("-");
-  // Uploaded paths are shaped <uuid>-<original filename> — strip the uuid.
   return parts.length > 1 ? parts.slice(1).join("-") : withoutFolder;
 }
 
@@ -59,7 +59,8 @@ export default function ReviewPage() {
 
   const documentPath =
     storeDocumentPath || (isDev ? FALLBACK_DOCUMENT_PATH : "");
-  const receivingFacility =
+
+  const receivingFacility: Facility | null =
     storeReceivingFacility || (isDev ? FALLBACK_FACILITY : null);
 
   if (!documentPath || !receivingFacility) return null;
@@ -68,29 +69,28 @@ export default function ReviewPage() {
   const fileName = extractFileName(documentPath);
 
   async function handleSubmit() {
+    if (!receivingFacility) return;
+
     setSubmitError("");
     setSubmitting(true);
 
-    const {
-      referralId,
-      referenceNumber: submittedReferenceNumber,
-      error,
-    } = await submitPaperReferral({
-      documentPath,
+    // Strip leading bucket name if accidentally present in store
+    const cleanPath = documentPath.replace(/^paper-referrals\//, "");
+
+    const { referralId, error } = await submitPaperReferral({
+      documentPath: cleanPath,
       receivingFacility,
     });
 
     setSubmitting(false);
 
-    if (error || !referralId || !submittedReferenceNumber) {
+    if (error || !referralId) {
       setSubmitError(error ?? "Something went wrong. Please try again.");
       return;
     }
 
     reset();
-    router.push(
-      `/new-referral/submitted?type=paper&ref=${submittedReferenceNumber}`,
-    );
+    router.push(`/dashboard/new-referral/submitted?id=${referralId}`);
   }
 
   const facilityRows = [
@@ -183,25 +183,30 @@ export default function ReviewPage() {
         </div>
       </div>
 
-      {/* Confirmation checkbox — gates Submit */}
-      <label className="flex items-start gap-sm rounded-lg border border-gray-100 bg-white p-base">
+      {/* Confirmation checkbox */}
+      <label className="flex items-start gap-sm rounded-lg border border-gray-100 bg-white p-base cursor-pointer">
         <input
           type="checkbox"
           checked={confirmed}
           onChange={(e) => setConfirmed(e.target.checked)}
           className="mt-[2px] h-4 w-4 shrink-0 rounded border-gray-300 text-green-700 focus:ring-green-500"
         />
-        <span className="font-body text-body-sm text-text-secondary">
+        <span className="font-body text-body-sm text-text-secondary select-none">
           I confirm the receiving facility and uploaded document are correct.
         </span>
       </label>
 
-      {/* Footer actions */}
+      {/* Error display */}
       {submitError && (
-        <p role="alert" className="font-body text-body-sm text-emergency">
+        <p
+          role="alert"
+          className="font-body text-body-sm text-emergency font-medium"
+        >
           {submitError}
         </p>
       )}
+
+      {/* Footer actions */}
       <div className="mt-base flex flex-wrap items-center justify-between gap-sm">
         <Button
           variant="outline"
@@ -214,7 +219,7 @@ export default function ReviewPage() {
         <Button
           variant="primary"
           type="button"
-          disabled={!confirmed}
+          disabled={!confirmed || submitting}
           isLoading={submitting}
           onClick={handleSubmit}
         >

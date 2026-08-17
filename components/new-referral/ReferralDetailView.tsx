@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import ReferralHeader from "./ReferralHeader";
 import PatientAndFacilityInfo from "./PatientAndFacilityInfo";
 import ClinicalDetailsSection from "./ClinicalDetailsSection";
@@ -8,12 +9,15 @@ import ReferralTimelineSidebar from "./ReferralTimelineSidebar";
 import AcceptReferralModal from "./AcceptReferralModal";
 import DeclineReferralModal from "./DeclineReferralModal";
 import { DetailedReferral } from "@/lib/referral-types";
+import { acceptReferral, declineReferral } from "@/services/referral.service";
 
 export default function ReferralDetailView({
-  referral,
+  referral: initialReferral,
 }: {
   referral: DetailedReferral;
 }) {
+  const router = useRouter();
+  const [referral, setReferral] = useState<DetailedReferral>(initialReferral);
   const [isAcceptModalOpen, setIsAcceptModalOpen] = useState(false);
   const [isDeclineModalOpen, setIsDeclineModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -22,10 +26,18 @@ export default function ReferralDetailView({
   const handleConfirmAccept = async () => {
     setIsSubmitting(true);
     try {
-      // API call to accept referral
-      // await acceptReferralApi(referral.id);
-      console.log("Accepted referral:", referral.id);
+      const { data, error } = await acceptReferral(referral.id);
+
+      if (error) {
+        window.alert(`Failed to accept referral: ${error}`);
+        return;
+      }
+
+      if (data) {
+        setReferral(data);
+      }
       setIsAcceptModalOpen(false);
+      router.refresh();
     } catch (err) {
       console.error(err);
     } finally {
@@ -40,10 +52,22 @@ export default function ReferralDetailView({
   ) => {
     setIsSubmitting(true);
     try {
-      // API call to decline referral
-      // await declineReferralApi(referral.id, { reason, actionType });
-      console.log("Declined referral:", referral.id, { reason, actionType });
+      const { data, error } = await declineReferral(
+        referral.id,
+        reason,
+        actionType,
+      );
+
+      if (error) {
+        window.alert(`Failed to decline referral: ${error}`);
+        return;
+      }
+
+      if (data) {
+        setReferral(data);
+      }
       setIsDeclineModalOpen(false);
+      router.refresh();
     } catch (err) {
       console.error(err);
     } finally {
@@ -52,7 +76,7 @@ export default function ReferralDetailView({
   };
 
   return (
-    <div className="flex flex-col gap-base p-2 md:p-6 bg-gray-100">
+    <div className="flex flex-col gap-base bg-gray-100 p-2 md:p-6">
       {/* 1. Header Card with Action Trigger Handlers */}
       <ReferralHeader
         referenceNumber={referral.referenceNumber}
@@ -98,9 +122,11 @@ export default function ReferralDetailView({
       <DeclineReferralModal
         isOpen={isDeclineModalOpen}
         onClose={() => setIsDeclineModalOpen(false)}
+        onConfirm={handleConfirmDecline}
         patientName={referral.patient.fullName}
         referenceNumber={referral.referenceNumber}
         referringFacilityName={referral.referringFacility.name}
+        isSubmitting={isSubmitting}
       />
     </div>
   );

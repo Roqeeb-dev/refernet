@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
-import { RotateCcw, ArrowRightLeft } from "lucide-react";
+import { useState } from "react";
 import Button from "@/components/shared/Button";
 import FacilitySelector, { Facility } from "./FacilitySelector";
 import DeclineSuccessModal from "./DeclineSuccessModal";
@@ -12,11 +11,12 @@ interface DeclineReferralModalProps {
   patientName: string;
   referenceNumber: string;
   referringFacilityName: string;
-  onCompleteDecline?: (payload: {
-    reason: string;
-    actionType: "return" | "re-refer";
-    targetFacility?: Facility;
-  }) => void;
+  onConfirm: (
+    reason: string,
+    actionType: "return" | "re-refer",
+    targetFacilityId?: string,
+  ) => Promise<void>;
+  isSubmitting?: boolean;
 }
 
 export default function DeclineReferralModal({
@@ -25,16 +25,14 @@ export default function DeclineReferralModal({
   patientName,
   referenceNumber,
   referringFacilityName,
-  onCompleteDecline,
+  onConfirm,
+  isSubmitting = false,
 }: DeclineReferralModalProps) {
   const [reason, setReason] = useState("");
   const [nextAction, setNextAction] = useState<"return" | "re-refer">("return");
   const [selectedFacility, setSelectedFacility] = useState<
     Facility | undefined
   >();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Controls post-decline success modal view
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   if (!isOpen) return null;
@@ -44,21 +42,11 @@ export default function DeclineReferralModal({
     isSubmitting || !reason.trim() || (isReRefer && !selectedFacility);
 
   const handleSubmit = async () => {
-    setIsSubmitting(true);
     try {
-      // Execute parent callback or API call
-      if (onCompleteDecline) {
-        await onCompleteDecline({
-          reason,
-          actionType: nextAction,
-          targetFacility: selectedFacility,
-        });
-      }
+      await onConfirm(reason, nextAction, selectedFacility?.id);
       setShowSuccessModal(true);
     } catch (err) {
       console.error(err);
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -67,7 +55,6 @@ export default function DeclineReferralModal({
     onClose();
   };
 
-  // Render Success State Dialog
   if (showSuccessModal) {
     return (
       <DeclineSuccessModal
@@ -80,20 +67,22 @@ export default function DeclineReferralModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-base backdrop-blur-xs">
-      <div className="max-h-[90vh] w-full max-w-[500px] overflow-y-auto rounded-2xl bg-white p-lg shadow-xl border border-gray-100">
-        <h2 className="font-heading text-heading-xs font-bold text-text-primary">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-[2px]">
+      <div className="max-h-[90vh] w-full max-w-[460px] overflow-y-auto rounded-[20px] bg-white p-6 shadow-2xl transition-all">
+        {/* Header */}
+        <h2 className="font-serif text-[22px] font-bold text-[#0F392B]">
           Decline Referral
         </h2>
+        <div className="mt-3 border-b border-gray-100" />
 
-        {/* Patient Summary Header Tag */}
-        <div className="mt-base rounded-xl bg-red-50/60 p-sm border border-red-100 font-body text-body-xs font-bold text-red-800">
+        {/* Patient Red Banner Tag */}
+        <div className="mt-4 rounded-xl bg-[#FDE8E8] px-4 py-2.5 text-center text-xs font-bold text-[#C81E1E]">
           {patientName} · {referenceNumber}
         </div>
 
-        {/* Reason Textarea */}
-        <div className="mt-base flex flex-col gap-xs">
-          <label className="font-body text-caption font-bold text-text-primary">
+        {/* Reason Textarea Section */}
+        <div className="mt-4 flex flex-col gap-1.5">
+          <label className="text-xs font-bold text-[#2D3748]">
             Reason for declining
           </label>
           <textarea
@@ -101,92 +90,100 @@ export default function DeclineReferralModal({
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             placeholder="Explain why you are unable to accept this referral. This will be shared with the referring facility."
-            className="w-full rounded-xl border border-gray-200 p-sm font-body text-body-xs text-text-primary placeholder:text-text-disabled focus:border-red-400 focus:outline-none focus:ring-1 focus:ring-red-400"
+            className="w-full resize-none rounded-xl border border-gray-200 p-3 text-xs text-[#2D3748] placeholder:text-gray-400 focus:border-[#1B7340] focus:outline-none focus:ring-1 focus:ring-[#1B7340]"
           />
         </div>
 
         {/* What Happens Next Section */}
-        <div className="mt-base flex flex-col gap-xs">
-          <label className="font-body text-caption font-bold text-text-primary">
+        <div className="mt-4 flex flex-col gap-2">
+          <label className="text-xs font-bold text-[#2D3748]">
             What happens next for the patient?
           </label>
 
-          <div className="flex flex-col gap-sm">
-            {/* Action 1: Return to Referring Facility */}
+          <div className="flex flex-col gap-2.5">
+            {/* Option 1: Return */}
             <div
               onClick={() => setNextAction("return")}
-              className={`flex cursor-pointer items-start gap-sm rounded-xl border p-sm transition-all ${
+              className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3.5 transition-all ${
                 nextAction === "return"
-                  ? "border-red-500 bg-red-50/20 shadow-xs"
+                  ? "border-emerald-200 bg-white"
                   : "border-gray-100 bg-white hover:bg-gray-50"
               }`}
             >
-              <div className="mt-[2px] flex h-7 w-7 items-center justify-center rounded-lg bg-red-100 text-red-700">
-                <RotateCcw size={16} />
+              <div className="pt-0.5">
+                <span
+                  className={`flex h-4 w-4 items-center justify-center rounded-full border ${
+                    nextAction === "return"
+                      ? "border-[#1B7340] bg-white"
+                      : "border-gray-300 bg-white"
+                  }`}
+                >
+                  {nextAction === "return" && (
+                    <span className="h-2 w-2 rounded-full bg-[#1B7340]" />
+                  )}
+                </span>
               </div>
               <div className="flex-1">
-                <p className="font-body text-body-xs font-bold text-text-primary">
+                <p className="text-xs font-bold text-[#2D3748]">
                   Return to {referringFacilityName}
                 </p>
-                <p className="font-body text-caption text-text-disabled">
+                <p className="mt-0.5 text-[11px] text-[#718096]">
                   Patient is sent back to the referring facility
                 </p>
               </div>
-              <input
-                type="radio"
-                name="nextAction"
-                checked={nextAction === "return"}
-                onChange={() => setNextAction("return")}
-                className="mt-xs accent-red-600"
-              />
             </div>
 
-            {/* Action 2: Refer to Another Facility */}
+            {/* Option 2: Re-refer */}
             <div
               onClick={() => setNextAction("re-refer")}
-              className={`flex cursor-pointer items-start gap-sm rounded-xl border p-sm transition-all ${
+              className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3.5 transition-all ${
                 nextAction === "re-refer"
-                  ? "border-red-500 bg-red-50/20 shadow-xs"
+                  ? "border-emerald-200 bg-white"
                   : "border-gray-100 bg-white hover:bg-gray-50"
               }`}
             >
-              <div className="mt-[2px] flex h-7 w-7 items-center justify-center rounded-lg bg-red-100 text-red-700">
-                <ArrowRightLeft size={16} />
+              <div className="pt-0.5">
+                <span
+                  className={`flex h-4 w-4 items-center justify-center rounded-full border ${
+                    nextAction === "re-refer"
+                      ? "border-[#1B7340] bg-white"
+                      : "border-gray-300 bg-white"
+                  }`}
+                >
+                  {nextAction === "re-refer" && (
+                    <span className="h-2 w-2 rounded-full bg-[#1B7340]" />
+                  )}
+                </span>
               </div>
               <div className="flex-1">
-                <p className="font-body text-body-xs font-bold text-red-800">
+                <p className="text-xs font-bold text-[#2D3748]">
                   Refer to Another Facility
                 </p>
-                <p className="font-body text-caption text-text-disabled">
+                <p className="mt-0.5 text-[11px] text-[#718096]">
                   You select a suitable facility and initiate a new referral
                 </p>
               </div>
-              <input
-                type="radio"
-                name="nextAction"
-                checked={nextAction === "re-refer"}
-                onChange={() => setNextAction("re-refer")}
-                className="mt-xs accent-red-600"
-              />
             </div>
           </div>
         </div>
 
-        {/* CONDITIONAL FACILITY SELECTOR */}
+        {/* Facility Selector when re-referring */}
         {isReRefer && (
-          <FacilitySelector
-            selectedFacilityId={selectedFacility?.id}
-            onSelectFacility={(fac) => setSelectedFacility(fac)}
-          />
+          <div className="mt-3">
+            <FacilitySelector
+              selectedFacilityId={selectedFacility?.id}
+              onSelectFacility={(fac) => setSelectedFacility(fac)}
+            />
+          </div>
         )}
 
-        {/* Modal Buttons */}
-        <div className="mt-lg flex items-center justify-end gap-sm">
+        {/* Modal Actions */}
+        <div className="mt-6 flex items-center justify-end gap-3">
           <Button
             variant="outline"
             onClick={onClose}
             disabled={isSubmitting}
-            className="w-full border-gray-200 text-text-primary hover:bg-gray-50"
+            className="w-full rounded-xl border border-gray-200 bg-white py-3 text-sm font-semibold text-[#4A5568] hover:bg-gray-50 hover:text-[#2D3748]"
           >
             Cancel
           </Button>
@@ -194,13 +191,9 @@ export default function DeclineReferralModal({
             variant="primary"
             onClick={handleSubmit}
             disabled={isSubmitDisabled}
-            className="w-full bg-red-600 hover:bg-red-700 text-white disabled:bg-red-300"
+            className="w-full rounded-xl bg-[#1B7340] py-3 text-sm font-bold text-white hover:bg-[#145A32] disabled:opacity-50"
           >
-            {isSubmitting
-              ? "Processing..."
-              : isReRefer
-                ? "Confirm & Re-refer"
-                : "Confirm Decline"}
+            {isSubmitting ? "Processing..." : "Proceed"}
           </Button>
         </div>
       </div>

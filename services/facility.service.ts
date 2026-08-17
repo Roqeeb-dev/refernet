@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabaseClient";
-import type { FacilityAvailabilityStatus } from "@/lib/facility";
+import type { Facility, FacilityAvailabilityStatus } from "@/lib/facility";
 
 export type ApprovalStatus = "pending_review" | "approved" | "rejected";
 export type AvailabilityStatus = FacilityAvailabilityStatus;
@@ -43,6 +43,44 @@ export interface FacilityRegistration {
 interface ServiceResult<T> {
   data: T | null;
   error: string | null;
+}
+
+// Helper: Calculate elapsed minutes from timestamp
+function calculateMinutesAgo(updatedAt?: string): number | undefined {
+  if (!updatedAt) return undefined;
+  const diffMs = Date.now() - new Date(updatedAt).getTime();
+  return Math.max(0, Math.floor(diffMs / (1000 * 60)));
+}
+
+// Helper: Format raw DB row into Facility UI interface
+function mapToFacility(item: FacilityRegistration): Facility {
+  const addressParts = [item.street_address, item.lga, item.state].filter(
+    Boolean,
+  );
+
+  return {
+    id: item.id, // Real database UUID
+    name: item.facility_name ?? "Unknown Facility",
+    type: item.facility_type ?? "general_hospital",
+    address: addressParts.join(", ") || "Address unavailable",
+    status: item.availability_status ?? "accepting",
+    note: item.availability_note ?? undefined,
+    updatedMinutesAgo: calculateMinutesAgo(item.availability_updated_at),
+  };
+}
+
+export async function fetchFacilities(): Promise<ServiceResult<Facility[]>> {
+  const { data, error } = await supabase
+    .from("facility_registrations")
+    .select("*")
+    .eq("status", "approved");
+
+  if (error) {
+    return { data: null, error: error.message };
+  }
+
+  const facilities = (data as FacilityRegistration[]).map(mapToFacility);
+  return { data: facilities, error: null };
 }
 
 export async function getMyFacility(): Promise<
@@ -115,6 +153,7 @@ export async function updateFacilityAvailability(
     .update({
       availability_status: availabilityStatus,
       availability_note: note ?? null,
+      availability_updated_at: new Date().toISOString(),
     })
     .eq("id", facilityId)
     .select("*")
@@ -126,3 +165,6 @@ export async function updateFacilityAvailability(
 
   return { data: data as FacilityRegistration, error: null };
 }
+
+// Alias to match store calls directly
+export const updateFacilityStatus = updateFacilityAvailability;

@@ -27,21 +27,33 @@ export default function RecentActivityCard({
           View All →
         </Link>
       </div>
-      <ul className="flex flex-col gap-base">
-        {activities.map((activity, i) => (
-          <li key={i} className="flex items-start gap-sm">
-            <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-green-500" />
-            <div>
-              <p className="font-body text-body-sm text-text-primary">
-                {activity.text}
-              </p>
-              <p className="font-body text-caption text-text-secondary">
-                {activity.time}
-              </p>
-            </div>
-          </li>
-        ))}
-      </ul>
+
+      {activities.length === 0 ? (
+        <div className="flex flex-col items-center justify-center rounded-md border border-dashed border-gray-200 py-2xl text-center">
+          <p className="font-body text-body-sm font-medium text-text-primary">
+            No recent activity
+          </p>
+          <p className="mt-xs font-body text-caption text-text-secondary">
+            Updates and referral events will appear here as they happen.
+          </p>
+        </div>
+      ) : (
+        <ul className="flex flex-col gap-base">
+          {activities.map((activity, i) => (
+            <li key={i} className="flex items-start gap-sm">
+              <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-green-500" />
+              <div>
+                <p className="font-body text-body-sm text-text-primary">
+                  {activity.text}
+                </p>
+                <p className="font-body text-caption text-text-secondary">
+                  {activity.time}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
