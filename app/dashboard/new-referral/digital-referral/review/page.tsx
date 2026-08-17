@@ -6,6 +6,7 @@ import Link from "next/link";
 import Button from "@/components/shared/Button";
 import { useDigitalReferralDraftStore } from "@/store/useDigitalReferralStore";
 import { useFacility } from "@/hooks/useFacility";
+import { submitDigitalReferral } from "@/services/digitalReferral.service";
 import {
   getFacilityTypeLabel,
   getFacilityAvailabilityOption,
@@ -37,28 +38,33 @@ export default function ReviewConfirmPage() {
 
   const vitalsSummary = `BP ${clinicalInfo.vitals.bloodPressure} · HR ${clinicalInfo.vitals.heartRate} · T ${clinicalInfo.vitals.temperature}°C`;
 
-  const handleSubmit = async () => {
-    setIsSubmitting(true);
-    try {
-      // TODO: replace with the real digital referral service once built,
-      // mirroring submitPaperReferral's shape. Payload assembled here is
-      // ready to hand off:
-      const payload = {
-        draftReferralId,
-        patientInfo,
-        clinicalInfo,
-        receivingFacility,
-      };
-      console.log("Submitting digital referral payload:", payload);
+  const reset = useDigitalReferralDraftStore((s) => s.reset);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
-      // On real success: call useDigitalReferralDraftStore.getState().reset()
-      // then route using the server-assigned reference number, e.g.:
-      // router.push(`/new-referral/submitted?type=digital&ref=${referenceNumber}`);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsSubmitting(false);
+  const handleSubmit = async () => {
+    if (!receivingFacility) {
+      setSubmitError("Please select a receiving facility first.");
+      return;
     }
+
+    setSubmitError(null);
+    setIsSubmitting(true);
+
+    const { referenceNumber, error } = await submitDigitalReferral({
+      patientInfo,
+      clinicalInfo,
+      receivingFacility,
+    });
+
+    setIsSubmitting(false);
+
+    if (error || !referenceNumber) {
+      setSubmitError(error ?? "Something went wrong. Please try again.");
+      return;
+    }
+
+    reset();
+    router.push(`/new-referral/submitted?type=digital&ref=${referenceNumber}`);
   };
 
   return (
@@ -196,28 +202,35 @@ export default function ReviewConfirmPage() {
       </div>
 
       {/* Footer Navigation */}
-      <div className="mt-base flex items-center justify-between">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() =>
-            router.push(
-              "/dashboard/new-referral/digital-referral/select-facility",
-            )
-          }
-        >
-          Back
-        </Button>
+      <div className="flex flex-col gap-sm">
+        {submitError && (
+          <p role="alert" className="font-body text-body-sm text-emergency">
+            {submitError}
+          </p>
+        )}
+        <div className="mt-base flex items-center justify-between">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() =>
+              router.push(
+                "/dashboard/new-referral/digital-referral/select-facility",
+              )
+            }
+          >
+            Back
+          </Button>
 
-        <Button
-          type="button"
-          variant="primary"
-          onClick={handleSubmit}
-          disabled={isSubmitting}
-          className="bg-green-700 hover:bg-green-800"
-        >
-          {isSubmitting ? "Submitting..." : "Submit Referral"}
-        </Button>
+          <Button
+            type="button"
+            variant="primary"
+            onClick={handleSubmit}
+            disabled={isSubmitting}
+            className="bg-green-700 hover:bg-green-800"
+          >
+            {isSubmitting ? "Submitting..." : "Submit Referral"}
+          </Button>
+        </div>
       </div>
     </div>
   );
