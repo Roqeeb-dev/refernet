@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
 import Button from "@/components/shared/Button";
@@ -8,7 +8,7 @@ import FacilityCard from "@/components/new-referral/FacilityCard";
 import EmptyFacilityState from "@/components/new-referral/EmptyFacilityState";
 import { FACILITY_TYPE_OPTIONS } from "@/lib/facility";
 import { MOCK_FACILITIES } from "@/lib/data";
-// import { useDigitalReferralDraftStore } from "@/store/useDraftId";
+import { useDigitalReferralDraftStore } from "@/store/useDigitalReferralStore";
 
 const STATES = Array.from(
   new Set(MOCK_FACILITIES.map((f) => f.address.split(",").pop()!.trim())),
@@ -17,15 +17,24 @@ const STATES = Array.from(
 export default function SelectFacilityPage() {
   const router = useRouter();
 
-  // Hook for digital store (uncomment when store is ready)
-  // const setReceivingFacility = useDigitalReferralDraftStore(
-  //   (s) => s.setReceivingFacility,
-  // );
+  const receivingFacility = useDigitalReferralDraftStore(
+    (s) => s.receivingFacility,
+  );
+  const setReceivingFacility = useDigitalReferralDraftStore(
+    (s) => s.setReceivingFacility,
+  );
 
   const [search, setSearch] = useState("");
   const [stateFilter, setStateFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  // Pre-select whatever was already chosen if the user navigated back here.
+  const [selectedId, setSelectedId] = useState<string | null>(
+    receivingFacility?.id ?? null,
+  );
+
+  useEffect(() => {
+    useDigitalReferralDraftStore.persist.rehydrate();
+  }, []);
 
   const filteredFacilities = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -55,9 +64,7 @@ export default function SelectFacilityPage() {
     const facility = MOCK_FACILITIES.find((f) => f.id === selectedId);
     if (!facility) return;
 
-    // Save selected receiving facility to store
-    // setReceivingFacility(facility);
-
+    setReceivingFacility(facility);
     router.push("/dashboard/new-referral/digital-referral/review");
   }
 
@@ -128,7 +135,11 @@ export default function SelectFacilityPage() {
         <Button
           variant="outline"
           type="button"
-          onClick={() => router.push("/new-referral/digital/clinical-info")}
+          onClick={() =>
+            router.push(
+              "/dashboard/new-referral/digital-referral/clinical-info",
+            )
+          }
         >
           Back
         </Button>

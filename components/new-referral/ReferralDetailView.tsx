@@ -98,11 +98,9 @@ export default function ReferralDetailView({
       <DeclineReferralModal
         isOpen={isDeclineModalOpen}
         onClose={() => setIsDeclineModalOpen(false)}
-        onConfirm={handleConfirmDecline}
         patientName={referral.patient.fullName}
         referenceNumber={referral.referenceNumber}
         referringFacilityName={referral.referringFacility.name}
-        isSubmitting={isSubmitting}
       />
     </div>
   );

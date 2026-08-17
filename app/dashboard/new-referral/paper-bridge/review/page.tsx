@@ -10,9 +10,6 @@ import type { Facility } from "@/lib/facility";
 
 const isDev = process.env.NODE_ENV === "development";
 
-// Dev-only sample data so this page can be opened directly while building
-// the UI, without having to walk through Upload + Select Facility every
-// time. Never used in production — see the isDev checks below.
 const FALLBACK_DOCUMENT_PATH =
   "paper-referrals/dev/00000000-0000-0000-0000-000000000000-sample-referral.pdf";
 
@@ -74,20 +71,26 @@ export default function ReviewPage() {
     setSubmitError("");
     setSubmitting(true);
 
-    const { referralId, error } = await submitPaperReferral({
+    const {
+      referralId,
+      referenceNumber: submittedReferenceNumber,
+      error,
+    } = await submitPaperReferral({
       documentPath,
       receivingFacility,
     });
 
     setSubmitting(false);
 
-    if (error || !referralId) {
+    if (error || !referralId || !submittedReferenceNumber) {
       setSubmitError(error ?? "Something went wrong. Please try again.");
       return;
     }
 
     reset();
-    router.push("/new-referral/submitted?type=paper&ref=RN-PAPER-8257");
+    router.push(
+      `/new-referral/submitted?type=paper&ref=${submittedReferenceNumber}`,
+    );
   }
 
   const facilityRows = [

@@ -1,49 +1,33 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 import Button from "@/components/shared/Button";
 import Input from "@/components/shared/Input";
-
-export interface PatientInfoFormData {
-  fullName: string;
-  age: string;
-  sex: "Male" | "Female" | "Other" | "";
-  phone: string;
-  email: string;
-  insuranceStatus: string;
-  enrolleeNumber: string;
-  referringFacility: string;
-  facilityContact: string;
-}
-
-const INITIAL_FORM_DATA: PatientInfoFormData = {
-  fullName: "",
-  age: "",
-  sex: "",
-  phone: "",
-  email: "",
-  insuranceStatus: "",
-  enrolleeNumber: "",
-  referringFacility: "Lagos University Teaching Hospital",
-  facilityContact: "+234 812 345 6789",
-};
+import { useDigitalReferralDraftStore } from "@/store/useDigitalReferralStore";
+import { useFacility } from "@/hooks/useFacility";
 
 export default function PatientInfoPage() {
   const router = useRouter();
-  const [formData, setFormData] =
-    useState<PatientInfoFormData>(INITIAL_FORM_DATA);
+  const { facility } = useFacility();
 
-  const handleChange = (field: keyof PatientInfoFormData, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+  const patientInfo = useDigitalReferralDraftStore((s) => s.patientInfo);
+  const setPatientInfo = useDigitalReferralDraftStore((s) => s.setPatientInfo);
+  const ensureDraftId = useDigitalReferralDraftStore((s) => s.ensureDraftId);
+
+  useEffect(() => {
+    useDigitalReferralDraftStore.persist.rehydrate();
+    ensureDraftId();
+  }, []);
+
+  const handleChange = (field: keyof typeof patientInfo, value: string) => {
+    setPatientInfo({ [field]: value });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Pass `formData` to store or API call here
-    console.log("Submitting Patient Info:", formData);
-    router.push("/new-referral/digital/clinical-info");
+    router.push("/dashboard/new-referral/digital-referral/clinical-info");
   };
 
   return (
@@ -59,7 +43,7 @@ export default function PatientInfoPage() {
         <Input
           type="text"
           placeholder="Full name as on ID"
-          value={formData.fullName}
+          value={patientInfo.fullName}
           onChange={(e) => handleChange("fullName", e.target.value)}
         />
       </div>
@@ -73,7 +57,7 @@ export default function PatientInfoPage() {
           </label>
           <div className="relative">
             <select
-              value={formData.age}
+              value={patientInfo.age}
               onChange={(e) => handleChange("age", e.target.value)}
               className="w-full appearance-none rounded-lg border border-gray-200 bg-white px-base py-sm font-body text-body-sm text-text-primary outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500"
             >
@@ -103,7 +87,7 @@ export default function PatientInfoPage() {
               <label
                 key={option}
                 className={`flex cursor-pointer items-center justify-center gap-xs rounded-lg border p-sm font-body text-body-sm transition-colors ${
-                  formData.sex === option
+                  patientInfo.sex === option
                     ? "border-green-500 bg-green-50/50 font-semibold text-green-700"
                     : "border-gray-200 text-text-secondary hover:border-gray-300"
                 }`}
@@ -112,7 +96,7 @@ export default function PatientInfoPage() {
                   type="radio"
                   name="sex"
                   value={option}
-                  checked={formData.sex === option}
+                  checked={patientInfo.sex === option}
                   onChange={() => handleChange("sex", option)}
                   className="accent-green-600"
                 />
@@ -131,7 +115,7 @@ export default function PatientInfoPage() {
         <Input
           type="tel"
           placeholder="08012345678"
-          value={formData.phone}
+          value={patientInfo.phone}
           onChange={(e) => handleChange("phone", e.target.value)}
         />
         <span className="font-body text-caption text-text-disabled">
@@ -148,7 +132,7 @@ export default function PatientInfoPage() {
         <Input
           type="email"
           placeholder="patient@email.com"
-          value={formData.email}
+          value={patientInfo.email}
           onChange={(e) => handleChange("email", e.target.value)}
         />
       </div>
@@ -161,7 +145,7 @@ export default function PatientInfoPage() {
         </label>
         <div className="relative">
           <select
-            value={formData.insuranceStatus}
+            value={patientInfo.insuranceStatus}
             onChange={(e) => handleChange("insuranceStatus", e.target.value)}
             className="w-full appearance-none rounded-lg border border-gray-200 bg-white px-base py-sm font-body text-body-sm text-text-primary outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500"
           >
@@ -189,14 +173,15 @@ export default function PatientInfoPage() {
         <Input
           type="text"
           placeholder="Enrolle/policy number"
-          value={formData.enrolleeNumber}
+          value={patientInfo.enrolleeNumber}
           onChange={(e) => handleChange("enrolleeNumber", e.target.value)}
         />
       </div>
 
       <hr className="my-xs border-gray-100" />
 
-      {/* Referring Facility Section */}
+      {/* Referring Facility Section -- pulled live from the signed-in
+          facility, not stored in the draft (not user-editable). */}
       <div className="flex flex-col gap-xs">
         <span className="font-body text-caption font-bold tracking-wider text-green-600 uppercase">
           REFERRING FACILITY (AUTO-POPULATED)
@@ -210,7 +195,7 @@ export default function PatientInfoPage() {
               type="text"
               readOnly
               disabled
-              value={formData.referringFacility}
+              value={facility?.facility_name ?? ""}
               className="bg-gray-50 text-text-secondary"
             />
           </div>
@@ -223,7 +208,7 @@ export default function PatientInfoPage() {
               type="text"
               readOnly
               disabled
-              value={formData.facilityContact}
+              value={facility?.phone_number ?? ""}
               className="bg-gray-50 text-text-secondary"
             />
           </div>
