@@ -59,7 +59,8 @@ export default function ReviewPage() {
 
   const documentPath =
     storeDocumentPath || (isDev ? FALLBACK_DOCUMENT_PATH : "");
-  const receivingFacility =
+
+  const receivingFacility: Facility | null =
     storeReceivingFacility || (isDev ? FALLBACK_FACILITY : null);
 
   if (!documentPath || !receivingFacility) return null;
@@ -68,6 +69,8 @@ export default function ReviewPage() {
   const fileName = extractFileName(documentPath);
 
   async function handleSubmit() {
+    if (!receivingFacility) return;
+
     setSubmitError("");
     setSubmitting(true);
 
@@ -82,15 +85,15 @@ export default function ReviewPage() {
 
     setSubmitting(false);
 
-    if (error || !referralId || !submittedReferenceNumber) {
+    if (error || !referralId) {
       setSubmitError(error ?? "Something went wrong. Please try again.");
       return;
     }
 
     reset();
-    router.push(
-      `/new-referral/submitted?type=paper&ref=${submittedReferenceNumber}`,
-    );
+
+    // Redirect using the database UUID 'id'
+    router.push(`/dashboard/new-referral/submitted?id=${referralId}`);
   }
 
   const facilityRows = [

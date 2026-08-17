@@ -50,7 +50,7 @@ export default function ReviewConfirmPage() {
     setSubmitError(null);
     setIsSubmitting(true);
 
-    const { referenceNumber, error } = await submitDigitalReferral({
+    const { referralId, referenceNumber, error } = await submitDigitalReferral({
       patientInfo,
       clinicalInfo,
       receivingFacility,
@@ -58,13 +58,15 @@ export default function ReviewConfirmPage() {
 
     setIsSubmitting(false);
 
-    if (error || !referenceNumber) {
+    if (error || !referralId) {
       setSubmitError(error ?? "Something went wrong. Please try again.");
       return;
     }
 
     reset();
-    router.push(`/new-referral/submitted?type=digital&ref=${referenceNumber}`);
+
+    // Redirect using the database UUID 'id' search parameter
+    router.push(`/dashboard/new-referral/submitted?id=${referralId}`);
   };
 
   return (

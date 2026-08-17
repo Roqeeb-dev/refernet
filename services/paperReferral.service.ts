@@ -66,30 +66,58 @@ export async function submitPaperReferral(
   };
 }
 
-export interface ReferralDetail {
+export interface DetailedReferral {
   id: string;
   referenceNumber: string;
-  documentPath: string | null;
+  referralType: "digital" | "paper";
   status: string;
   submittedAt: string;
+  documentPath: string | null;
+  declineReason?: string | null;
+  declineActionType?: string | null;
+  patient?: {
+    id: string;
+    fullName: string;
+    age?: number;
+    sex?: string;
+  };
+  referringFacility: {
+    id: string;
+    name: string;
+  };
   receivingFacility: {
     id: string;
     name: string;
   };
+  urgencyLevel?: string;
 }
 
 export async function getReferralById(
   id: string,
-): Promise<ReferralDetail | null> {
+): Promise<DetailedReferral | null> {
   const { data, error } = await supabase
     .from("referrals")
     .select(
       `
       id,
       reference_number,
-      document_path,
+      referral_type,
       status,
       created_at,
+      document_path,
+      decline_reason,
+      decline_action_type,
+      urgency_level,
+      patient:patients (
+        id,
+        full_name,
+        age,
+        sex
+      ),
+      referring_facility:facility_registrations!referring_facility_id (
+        id,
+        facility_name
+      ),
       receiving_facility:facility_registrations!receiving_facility_id (
         id,
         facility_name
@@ -101,15 +129,42 @@ export async function getReferralById(
 
   if (error || !data) return null;
 
+  // Safe relation normalization to handle array or object returns
+  const receiving = Array.isArray(data.receiving_facility)
+    ? data.receiving_facility[0]
+    : data.receiving_facility;
+
+  const referring = Array.isArray(data.referring_facility)
+    ? data.referring_facility[0]
+    : data.referring_facility;
+
+  const patient = Array.isArray(data.patient) ? data.patient[0] : data.patient;
+
   return {
     id: data.id,
     referenceNumber: data.reference_number,
-    documentPath: data.document_path,
+    referralType: data.referral_type,
     status: data.status,
     submittedAt: data.created_at,
+    documentPath: data.document_path,
+    declineReason: data.decline_reason,
+    declineActionType: data.decline_action_type,
+    urgencyLevel: data.urgency_level,
+    patient: patient
+      ? {
+          id: patient.id,
+          fullName: patient.full_name,
+          age: patient.age,
+          sex: patient.sex,
+        }
+      : undefined,
+    referringFacility: {
+      id: referring?.id ?? "",
+      name: referring?.facility_name ?? "Unknown Facility",
+    },
     receivingFacility: {
-      id: (data.receiving_facility as any).id,
-      name: (data.receiving_facility as any).facility_name,
+      id: receiving?.id ?? "",
+      name: receiving?.facility_name ?? "Unknown Facility",
     },
   };
 }
