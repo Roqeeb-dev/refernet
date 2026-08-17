@@ -6,16 +6,45 @@ import QuickActionsCard from "@/components/dashboard/QuickActionsCard";
 import RecentActivityCard from "@/components/dashboard/RecentActivityCard";
 import RecentOutgoingReferralsCard from "@/components/dashboard/RecentOutgoingReferralsCard";
 import UpdateFacilityStatusModal from "@/components/dashboard/UpdateFacilityStatusModal";
+import ReferralLoadingState from "@/components/dashboard/ReferralLoadingState";
+import ReferralErrorState from "@/components/dashboard/ReferralErrorState";
 import { useFacility } from "@/hooks/useFacility";
-import {
-  DASHBOARD_STATS,
-  DASHBOARD_RECENT_ACTIVITY,
-  DASHBOARD_RECENT_OUTGOING,
-} from "@/lib/data";
+import { useDashboardData } from "@/hooks/useDashboardData";
 
 export default function DashboardPage() {
   const { facility, updateStatus } = useFacility();
+  const { stats, activities, recentOutgoing, isLoading, error, refetch } =
+    useDashboardData();
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col gap-lg">
+        <div>
+          <h1 className="font-display text-heading-xl font-bold text-text-primary">
+            Dashboard
+          </h1>
+          <p className="font-body text-body-sm text-text-secondary">
+            Overview of your facility&apos;s referral activity
+          </p>
+        </div>
+        <ReferralLoadingState />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col gap-lg">
+        <div>
+          <h1 className="font-display text-heading-xl font-bold text-text-primary">
+            Dashboard
+          </h1>
+        </div>
+        <ReferralErrorState message={error} onRetry={refetch} />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-lg">
@@ -28,31 +57,31 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      {/* TODO: still mock data -- wire once patients/referrals table
-          shapes are confirmed */}
+      {/* Dynamic Statistics Grid */}
       <div className="grid gap-base sm:grid-cols-2 lg:grid-cols-4">
-        {DASHBOARD_STATS.map((stat) => (
+        {stats.map((stat) => (
           <StatCard key={stat.label} {...stat} />
         ))}
       </div>
 
+      {/* Actions and Recent Activity Timeline */}
       <div className="grid gap-lg lg:grid-cols-[280px_1fr]">
         <QuickActionsCard onUpdateStatus={() => setIsStatusModalOpen(true)} />
-        {/* TODO: still mock data */}
-        <RecentActivityCard activities={DASHBOARD_RECENT_ACTIVITY} />
+        <RecentActivityCard activities={activities} />
       </div>
 
-      {/* TODO: still mock data */}
-      <RecentOutgoingReferralsCard referrals={DASHBOARD_RECENT_OUTGOING} />
+      {/* Recent Outgoing Referrals */}
+      <RecentOutgoingReferralsCard referrals={recentOutgoing} />
 
+      {/* Facility Status Update Modal */}
       <UpdateFacilityStatusModal
         open={isStatusModalOpen}
         currentStatus={facility?.availability_status ?? "accepting"}
         onClose={() => setIsStatusModalOpen(false)}
         onSave={async (newStatus) => {
-          const { error } = await updateStatus(newStatus);
-          if (error) {
-            window.alert(`Couldn't update status: ${error}`);
+          const { error: statusError } = await updateStatus(newStatus);
+          if (statusError) {
+            window.alert(`Couldn't update status: ${statusError}`);
             return;
           }
           setIsStatusModalOpen(false);
