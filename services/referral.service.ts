@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabaseClient";
 import type { Facility } from "@/lib/facility";
+import { getMyFacilityId } from "@/lib/getMyFacilityId";
 
 export interface SubmitPaperReferralInput {
   documentPath: string;
@@ -27,14 +28,25 @@ export async function submitPaperReferral(
     };
   }
 
+  const { facilityId, error: facilityError } = await getMyFacilityId();
+  if (!facilityId) {
+    return {
+      referralId: null,
+      referenceNumber: null,
+      error: facilityError ?? "Could not determine your facility.",
+    };
+  }
+
   const { data, error } = await supabase
     .from("referrals")
     .insert({
       referral_type: "paper",
       document_path: input.documentPath,
-      referring_facility_id: user.id,
+      referring_facility_id: facilityId,
       receiving_facility_id: input.receivingFacility.id,
+      referred_by: user.id,
       status: "pending",
+      reason: "See attached referral document.",
     })
     .select("id, reference_number")
     .single();
@@ -77,7 +89,7 @@ export async function getReferralById(
       reference_number,
       document_path,
       status,
-      submitted_at,
+      created_at,
       receiving_facility:facility_registrations!receiving_facility_id (
         id,
         facility_name
@@ -94,7 +106,7 @@ export async function getReferralById(
     referenceNumber: data.reference_number,
     documentPath: data.document_path,
     status: data.status,
-    submittedAt: data.submitted_at,
+    submittedAt: data.created_at,
     receivingFacility: {
       id: (data.receiving_facility as any).id,
       name: (data.receiving_facility as any).facility_name,
