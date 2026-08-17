@@ -1,62 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Button from "@/components/shared/Button";
 import Input from "@/components/shared/Input";
 import FileUpload from "@/components/shared/FileUpload";
-
-export type UrgencyLevel = "Emergency" | "Critical" | "Urgent" | "Routine" | "";
-
-export interface ClinicalInfoFormData {
-  urgencyLevel: UrgencyLevel;
-  chiefComplaint: string;
-  provisionalDiagnosis: string;
-  clinicalHistory: string;
-  vitals: {
-    bloodPressure: string;
-    heartRate: string;
-    temperature: string;
-    respiratoryRate: string;
-    spO2: string;
-    bloodSugar: string;
-  };
-  management: {
-    currentMedications: string;
-    previouslyAdministeredMedications: string;
-    previousInterventions: string;
-  };
-  referralReason: {
-    reasonForReferral: string;
-    additionalNotes: string;
-  };
-  supportingDocumentPath: string;
-}
-
-const INITIAL_FORM_DATA: ClinicalInfoFormData = {
-  urgencyLevel: "Emergency",
-  chiefComplaint: "",
-  provisionalDiagnosis: "",
-  clinicalHistory: "",
-  vitals: {
-    bloodPressure: "120/80",
-    heartRate: "72",
-    temperature: "37.0",
-    respiratoryRate: "16",
-    spO2: "98",
-    bloodSugar: "5.5",
-  },
-  management: {
-    currentMedications: "",
-    previouslyAdministeredMedications: "",
-    previousInterventions: "",
-  },
-  referralReason: {
-    reasonForReferral: "",
-    additionalNotes: "",
-  },
-  supportingDocumentPath: "",
-};
+import {
+  useDigitalReferralDraftStore,
+  type UrgencyLevel,
+} from "@/store/useDigitalReferralStore";
 
 const URGENCY_OPTIONS: {
   label: UrgencyLevel;
@@ -87,28 +39,27 @@ const URGENCY_OPTIONS: {
 
 export default function ClinicalInfoPage() {
   const router = useRouter();
-  const [formData, setFormData] =
-    useState<ClinicalInfoFormData>(INITIAL_FORM_DATA);
 
-  // Helper for updating nested object fields
-  const handleNestedChange = (
-    section: "vitals" | "management" | "referralReason",
-    field: string,
-    value: string,
-  ) => {
-    setFormData((prev) => ({
-      ...prev,
-      [section]: {
-        ...prev[section],
-        [field]: value,
-      },
-    }));
-  };
+  const clinicalInfo = useDigitalReferralDraftStore((s) => s.clinicalInfo);
+  const setClinicalInfoField = useDigitalReferralDraftStore(
+    (s) => s.setClinicalInfoField,
+  );
+  const setVitals = useDigitalReferralDraftStore((s) => s.setVitals);
+  const setManagement = useDigitalReferralDraftStore((s) => s.setManagement);
+  const setReferralReason = useDigitalReferralDraftStore(
+    (s) => s.setReferralReason,
+  );
+  const setSupportingDocumentPath = useDigitalReferralDraftStore(
+    (s) => s.setSupportingDocumentPath,
+  );
+
+  useEffect(() => {
+    useDigitalReferralDraftStore.persist.rehydrate();
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Submitting Clinical Info:", formData);
-    router.push("/new-referral/digital/select-facility");
+    router.push("/dashboard/new-referral/digital-referral/select-facility");
   };
 
   return (
@@ -129,14 +80,12 @@ export default function ClinicalInfoPage() {
           </label>
           <div className="grid grid-cols-2 gap-sm sm:grid-cols-4">
             {URGENCY_OPTIONS.map(({ label, dotColor }) => {
-              const isSelected = formData.urgencyLevel === label;
+              const isSelected = clinicalInfo.urgencyLevel === label;
               return (
                 <button
                   key={label}
                   type="button"
-                  onClick={() =>
-                    setFormData((prev) => ({ ...prev, urgencyLevel: label }))
-                  }
+                  onClick={() => setClinicalInfoField({ urgencyLevel: label })}
                   className={`flex h-12 items-center justify-center gap-xs rounded-lg border font-body text-body-sm font-medium transition-all ${
                     isSelected
                       ? "border-green-600 bg-white shadow-xs ring-1 ring-green-600"
@@ -159,12 +108,9 @@ export default function ClinicalInfoPage() {
           <Input
             type="text"
             placeholder="Primary reason for visit or referral"
-            value={formData.chiefComplaint}
+            value={clinicalInfo.chiefComplaint}
             onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
-                chiefComplaint: e.target.value,
-              }))
+              setClinicalInfoField({ chiefComplaint: e.target.value })
             }
           />
         </div>
@@ -177,12 +123,9 @@ export default function ClinicalInfoPage() {
           <Input
             type="text"
             placeholder="e.g. Acute Myocardial Infarction..."
-            value={formData.provisionalDiagnosis}
+            value={clinicalInfo.provisionalDiagnosis}
             onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
-                provisionalDiagnosis: e.target.value,
-              }))
+              setClinicalInfoField({ provisionalDiagnosis: e.target.value })
             }
           />
         </div>
@@ -195,12 +138,9 @@ export default function ClinicalInfoPage() {
           <textarea
             rows={3}
             placeholder="Relevant past medical history, onset, duration..."
-            value={formData.clinicalHistory}
+            value={clinicalInfo.clinicalHistory}
             onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
-                clinicalHistory: e.target.value,
-              }))
+              setClinicalInfoField({ clinicalHistory: e.target.value })
             }
             className="w-full rounded-lg border border-gray-200 p-base font-body text-body-sm text-text-primary outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 placeholder:text-text-disabled"
           />
@@ -214,7 +154,6 @@ export default function ClinicalInfoPage() {
         </span>
 
         <div className="grid grid-cols-1 gap-base sm:grid-cols-2">
-          {/* Blood Pressure */}
           <div className="flex flex-col gap-xs">
             <label className="font-body text-body-sm font-bold text-text-primary">
               Blood Pressure
@@ -223,10 +162,8 @@ export default function ClinicalInfoPage() {
               <Input
                 type="text"
                 placeholder="120/80"
-                value={formData.vitals.bloodPressure}
-                onChange={(e) =>
-                  handleNestedChange("vitals", "bloodPressure", e.target.value)
-                }
+                value={clinicalInfo.vitals.bloodPressure}
+                onChange={(e) => setVitals({ bloodPressure: e.target.value })}
               />
               <span className="pointer-events-none absolute right-base top-1/2 -translate-y-1/2 font-body text-caption text-text-disabled">
                 mmHg
@@ -234,7 +171,6 @@ export default function ClinicalInfoPage() {
             </div>
           </div>
 
-          {/* Heart Rate */}
           <div className="flex flex-col gap-xs">
             <label className="font-body text-body-sm font-bold text-text-primary">
               Heart Rate
@@ -243,10 +179,8 @@ export default function ClinicalInfoPage() {
               <Input
                 type="text"
                 placeholder="72"
-                value={formData.vitals.heartRate}
-                onChange={(e) =>
-                  handleNestedChange("vitals", "heartRate", e.target.value)
-                }
+                value={clinicalInfo.vitals.heartRate}
+                onChange={(e) => setVitals({ heartRate: e.target.value })}
               />
               <span className="pointer-events-none absolute right-base top-1/2 -translate-y-1/2 font-body text-caption text-text-disabled">
                 bpm
@@ -254,7 +188,6 @@ export default function ClinicalInfoPage() {
             </div>
           </div>
 
-          {/* Temperature */}
           <div className="flex flex-col gap-xs">
             <label className="font-body text-body-sm font-bold text-text-primary">
               Temperature
@@ -263,10 +196,8 @@ export default function ClinicalInfoPage() {
               <Input
                 type="text"
                 placeholder="37.0"
-                value={formData.vitals.temperature}
-                onChange={(e) =>
-                  handleNestedChange("vitals", "temperature", e.target.value)
-                }
+                value={clinicalInfo.vitals.temperature}
+                onChange={(e) => setVitals({ temperature: e.target.value })}
               />
               <span className="pointer-events-none absolute right-base top-1/2 -translate-y-1/2 font-body text-caption text-text-disabled">
                 °C
@@ -274,7 +205,6 @@ export default function ClinicalInfoPage() {
             </div>
           </div>
 
-          {/* Respiratory Rate */}
           <div className="flex flex-col gap-xs">
             <label className="font-body text-body-sm font-bold text-text-primary">
               Respiratory Rate
@@ -283,14 +213,8 @@ export default function ClinicalInfoPage() {
               <Input
                 type="text"
                 placeholder="16"
-                value={formData.vitals.respiratoryRate}
-                onChange={(e) =>
-                  handleNestedChange(
-                    "vitals",
-                    "respiratoryRate",
-                    e.target.value,
-                  )
-                }
+                value={clinicalInfo.vitals.respiratoryRate}
+                onChange={(e) => setVitals({ respiratoryRate: e.target.value })}
               />
               <span className="pointer-events-none absolute right-base top-1/2 -translate-y-1/2 font-body text-caption text-text-disabled">
                 /min
@@ -298,7 +222,6 @@ export default function ClinicalInfoPage() {
             </div>
           </div>
 
-          {/* SpO2 (opt) */}
           <div className="flex flex-col gap-xs">
             <label className="font-body text-body-sm font-bold text-text-primary">
               SpO₂ <span className="font-normal text-text-disabled">(opt)</span>
@@ -307,10 +230,8 @@ export default function ClinicalInfoPage() {
               <Input
                 type="text"
                 placeholder="98"
-                value={formData.vitals.spO2}
-                onChange={(e) =>
-                  handleNestedChange("vitals", "spO2", e.target.value)
-                }
+                value={clinicalInfo.vitals.spO2}
+                onChange={(e) => setVitals({ spO2: e.target.value })}
               />
               <span className="pointer-events-none absolute right-base top-1/2 -translate-y-1/2 font-body text-caption text-text-disabled">
                 %
@@ -318,7 +239,6 @@ export default function ClinicalInfoPage() {
             </div>
           </div>
 
-          {/* Blood Sugar (opt) */}
           <div className="flex flex-col gap-xs">
             <label className="font-body text-body-sm font-bold text-text-primary">
               Blood Sugar{" "}
@@ -328,10 +248,8 @@ export default function ClinicalInfoPage() {
               <Input
                 type="text"
                 placeholder="5.5"
-                value={formData.vitals.bloodSugar}
-                onChange={(e) =>
-                  handleNestedChange("vitals", "bloodSugar", e.target.value)
-                }
+                value={clinicalInfo.vitals.bloodSugar}
+                onChange={(e) => setVitals({ bloodSugar: e.target.value })}
               />
               <span className="pointer-events-none absolute right-base top-1/2 -translate-y-1/2 font-body text-caption text-text-disabled">
                 mmol/L
@@ -347,7 +265,6 @@ export default function ClinicalInfoPage() {
           MANAGEMENT
         </span>
 
-        {/* Current Medications */}
         <div className="flex flex-col gap-xs">
           <label className="font-body text-body-sm font-bold text-text-primary">
             Current Medications
@@ -355,19 +272,14 @@ export default function ClinicalInfoPage() {
           <textarea
             rows={2}
             placeholder="List medications, doses, and frequencies..."
-            value={formData.management.currentMedications}
+            value={clinicalInfo.management.currentMedications}
             onChange={(e) =>
-              handleNestedChange(
-                "management",
-                "currentMedications",
-                e.target.value,
-              )
+              setManagement({ currentMedications: e.target.value })
             }
             className="w-full rounded-lg border border-gray-200 p-base font-body text-body-sm text-text-primary outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 placeholder:text-text-disabled"
           />
         </div>
 
-        {/* Previously Administered Medications */}
         <div className="flex flex-col gap-xs">
           <label className="font-body text-body-sm font-bold text-text-primary">
             Previously Administered Medications
@@ -375,19 +287,16 @@ export default function ClinicalInfoPage() {
           <textarea
             rows={2}
             placeholder="Medications given prior to this referral..."
-            value={formData.management.previouslyAdministeredMedications}
+            value={clinicalInfo.management.previouslyAdministeredMedications}
             onChange={(e) =>
-              handleNestedChange(
-                "management",
-                "previouslyAdministeredMedications",
-                e.target.value,
-              )
+              setManagement({
+                previouslyAdministeredMedications: e.target.value,
+              })
             }
             className="w-full rounded-lg border border-gray-200 p-base font-body text-body-sm text-text-primary outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 placeholder:text-text-disabled"
           />
         </div>
 
-        {/* Previous Interventions */}
         <div className="flex flex-col gap-xs">
           <label className="font-body text-body-sm font-bold text-text-primary">
             Previous Interventions
@@ -395,13 +304,9 @@ export default function ClinicalInfoPage() {
           <textarea
             rows={2}
             placeholder="Procedures or treatments already performed..."
-            value={formData.management.previousInterventions}
+            value={clinicalInfo.management.previousInterventions}
             onChange={(e) =>
-              handleNestedChange(
-                "management",
-                "previousInterventions",
-                e.target.value,
-              )
+              setManagement({ previousInterventions: e.target.value })
             }
             className="w-full rounded-lg border border-gray-200 p-base font-body text-body-sm text-text-primary outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 placeholder:text-text-disabled"
           />
@@ -414,7 +319,6 @@ export default function ClinicalInfoPage() {
           REFERRAL REASON
         </span>
 
-        {/* Reason for Referral */}
         <div className="flex flex-col gap-xs">
           <label className="font-body text-body-sm font-bold text-text-primary">
             Reason for Referral
@@ -422,19 +326,14 @@ export default function ClinicalInfoPage() {
           <textarea
             rows={3}
             placeholder="Why is this patient being referred and what does the receiving facility need to provide?"
-            value={formData.referralReason.reasonForReferral}
+            value={clinicalInfo.referralReason.reasonForReferral}
             onChange={(e) =>
-              handleNestedChange(
-                "referralReason",
-                "reasonForReferral",
-                e.target.value,
-              )
+              setReferralReason({ reasonForReferral: e.target.value })
             }
             className="w-full rounded-lg border border-gray-200 p-base font-body text-body-sm text-text-primary outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 placeholder:text-text-disabled"
           />
         </div>
 
-        {/* Additional Notes (optional) */}
         <div className="flex flex-col gap-xs">
           <label className="font-body text-body-sm font-bold text-text-primary">
             Additional Notes{" "}
@@ -443,13 +342,9 @@ export default function ClinicalInfoPage() {
           <textarea
             rows={2}
             placeholder="Any other relevant clinical information..."
-            value={formData.referralReason.additionalNotes}
+            value={clinicalInfo.referralReason.additionalNotes}
             onChange={(e) =>
-              handleNestedChange(
-                "referralReason",
-                "additionalNotes",
-                e.target.value,
-              )
+              setReferralReason({ additionalNotes: e.target.value })
             }
             className="w-full rounded-lg border border-gray-200 p-base font-body text-body-sm text-text-primary outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 placeholder:text-text-disabled"
           />
@@ -469,10 +364,8 @@ export default function ClinicalInfoPage() {
         <FileUpload
           label=""
           folder="clinical-documents"
-          value={formData.supportingDocumentPath}
-          onUploadComplete={(path) =>
-            setFormData((prev) => ({ ...prev, supportingDocumentPath: path }))
-          }
+          value={clinicalInfo.supportingDocumentPath}
+          onUploadComplete={(path) => setSupportingDocumentPath(path)}
         />
       </div>
 
@@ -481,7 +374,9 @@ export default function ClinicalInfoPage() {
         <Button
           type="button"
           variant="outline"
-          onClick={() => router.push("/new-referral/digital/patient-info")}
+          onClick={() =>
+            router.push("/dashboard/new-referral/digital-referral/patient-info")
+          }
         >
           Back
         </Button>

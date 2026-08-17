@@ -1,11 +1,19 @@
+"use client";
+
 import CurrentStatusCard from "@/components/profile/CurrentStatusCard";
 import FacilityInformationCard from "@/components/profile/FacilityInformationCard";
 import ServicesSpecialtiesCard from "@/components/profile/ServicesSpecialtiesCard";
 import StaffManagementCard from "@/components/profile/StaffManagementCard";
 import ChangePasswordCard from "@/components/profile/ChangePasswordCard";
 import AccountStatusCard from "@/components/profile/AccountStatusCard";
+import { useEffect } from "react";
+import { useFacilityProfileStore } from "@/store/useFacilityProfileStore";
 
 export default function FacilityProfilePage() {
+  useEffect(() => {
+    useFacilityProfileStore.getState().loadFacility();
+  }, []);
+
   return (
     <div className="flex flex-col gap-lg">
       <div>

@@ -1,11 +1,8 @@
 import { supabase } from "@/lib/supabaseClient";
+import type { FacilityAvailabilityStatus } from "@/lib/facility";
 
 export type ApprovalStatus = "pending_review" | "approved" | "rejected";
-export type AvailabilityStatus =
-  | "accepting"
-  | "limited"
-  | "emergency_only"
-  | "unavailable";
+export type AvailabilityStatus = FacilityAvailabilityStatus;
 
 export interface FacilityRegistration {
   id: string;
@@ -63,6 +60,42 @@ export async function getMyFacility(): Promise<
     .from("facility_registrations")
     .select("*")
     .eq("owner_id", user.id)
+    .single();
+
+  if (error) {
+    return { data: null, error: error.message };
+  }
+
+  return { data: data as FacilityRegistration, error: null };
+}
+
+export interface FacilityProfileUpdate {
+  facility_name?: string;
+  official_email?: string;
+  facility_type?: string;
+  phone_number?: string;
+  website?: string;
+  street_address?: string;
+  lga?: string;
+  state?: string;
+  total_beds?: number;
+  icu_beds?: number;
+  contact_name?: string;
+  contact_phone?: string;
+  contact_role?: string;
+  contact_email?: string;
+  services?: string[];
+}
+
+export async function updateFacilityProfile(
+  facilityId: string,
+  updates: FacilityProfileUpdate,
+): Promise<ServiceResult<FacilityRegistration>> {
+  const { data, error } = await supabase
+    .from("facility_registrations")
+    .update(updates)
+    .eq("id", facilityId)
+    .select("*")
     .single();
 
   if (error) {
