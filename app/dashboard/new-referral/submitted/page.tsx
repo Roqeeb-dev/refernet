@@ -24,7 +24,6 @@ function SubmittedPageContent() {
     async function fetchReferral() {
       try {
         setLoading(true);
-        // Unpack { data, error } returned by getReferralById
         const { data, error: serviceError } = await getReferralById(
           referralId!,
         );
@@ -60,7 +59,6 @@ function SubmittedPageContent() {
     );
   }
 
-  // Safe checks for paper vs digital attachments
   const hasAttachments = Boolean(
     referral.attachments && referral.attachments.length > 0,
   );
@@ -69,7 +67,6 @@ function SubmittedPageContent() {
     ? referral.attachments[0]?.name
     : undefined;
 
-  // Safe date parsing supporting string timestamps or pre-formatted date strings
   let formattedDate = "N/A";
   if (referral.receivedTime) {
     const parsedDate = new Date(referral.receivedTime);
@@ -85,7 +82,6 @@ function SubmittedPageContent() {
       : referral.receivedTime;
   }
 
-  // Safe property extraction with fallbacks to avoid runtime TypeError
   const submittedData = {
     type: isPaper ? ("paper" as const) : ("digital" as const),
     referenceNumber: referral.referenceNumber || "N/A",

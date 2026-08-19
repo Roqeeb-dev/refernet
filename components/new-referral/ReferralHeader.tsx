@@ -10,6 +10,7 @@ interface ReferralHeaderProps {
   urgency: string;
   facilityName: string;
   receivedTime: string;
+  isReceiver?: boolean;
   onAccept?: () => void;
   onDecline?: () => void;
   onCancel?: () => void;
@@ -22,11 +23,13 @@ export default function ReferralHeader({
   urgency,
   facilityName,
   receivedTime,
+  isReceiver,
   onAccept,
   onDecline,
   onCancel,
 }: ReferralHeaderProps) {
   const isIncoming = direction === "incoming";
+  const canTakeReceiverAction = isReceiver ?? isIncoming;
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-base rounded-2xl border border-gray-100 bg-white p-lg shadow-xs">
@@ -55,42 +58,24 @@ export default function ReferralHeader({
         </p>
       </div>
 
-      <div className="flex flex-col items-center gap-sm">
-        {isIncoming ? (
-          <>
-            <Button
-              variant="outline"
-              onClick={onDecline}
-              className="border-red-200 bg-red-50/50 text-red-700 hover:bg-red-100"
-            >
-              ✕ Decline Referral
-            </Button>
-            <Button
-              variant="primary"
-              onClick={onAccept}
-              className="bg-emerald-700 hover:bg-emerald-800"
-            >
-              ✓ Accept Referral
-            </Button>
-          </>
-        ) : (
-          <>
-            <Button
-              variant="outline"
-              onClick={onCancel}
-              className="border-gray-200 text-text-secondary hover:bg-gray-50"
-            >
-              Cancel Referral
-            </Button>
-            <Button
-              variant="primary"
-              className="bg-emerald-700 hover:bg-emerald-800"
-            >
-              Print Referral Slip
-            </Button>
-          </>
-        )}
-      </div>
+      {canTakeReceiverAction && (
+        <div className="flex flex-col items-center gap-sm">
+          <Button
+            variant="outline"
+            onClick={onDecline}
+            className="border-red-200 bg-red-50/50 text-red-700 hover:bg-red-100"
+          >
+            ✕ Decline Referral
+          </Button>
+          <Button
+            variant="primary"
+            onClick={onAccept}
+            className="bg-emerald-700 hover:bg-emerald-800"
+          >
+            ✓ Accept Referral
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
