@@ -70,10 +70,21 @@ function mapToFacility(item: FacilityRegistration): Facility {
 }
 
 export async function fetchFacilities(): Promise<ServiceResult<Facility[]>> {
-  const { data, error } = await supabase
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let query = supabase
     .from("facility_registrations")
     .select("*")
     .eq("status", "approved");
+
+  // Exclude the current user's facility if signed in
+  if (user) {
+    query = query.neq("owner_id", user.id);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     return { data: null, error: error.message };

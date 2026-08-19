@@ -11,6 +11,7 @@ export default async function ReferralDetailPage({ params }: PageProps) {
   const { data: referral, error } = await getReferralById(id);
 
   if (error || !referral) {
+    console.error("Referral fetch failed:", error);
     notFound();
   }
 

@@ -86,24 +86,20 @@ export async function getReferralById(
       urgency_level,
       created_at,
       chief_complaint,
-      diagnosis,
+      provisional_diagnosis,
       clinical_history,
+      vitals,
       current_medications,
-      previous_medications,
-      interventions,
-      reason_for_referral,
+      previously_administered_medications,
+      previous_interventions,
+      reason,
       additional_notes,
-      bp,
-      hr,
-      temp,
-      rr,
-      spo2,
       patients!patient_id (
         full_name,
         age,
         sex,
         phone,
-        nhia_number
+        enrollee_number
       ),
       referring_facility:facility_registrations!referring_facility_id (
         facility_name,
@@ -135,7 +131,7 @@ export async function getReferralById(
     ? data.receiving_facility[0]
     : data.receiving_facility;
 
-  // Resolve storage path to a usable Supabase URL
+  // Resolve storage path
   let fileUrl = "";
   if (data.document_path) {
     const { data: publicUrlData } = supabase.storage
@@ -143,6 +139,9 @@ export async function getReferralById(
       .getPublicUrl(data.document_path);
     fileUrl = publicUrlData.publicUrl;
   }
+
+  // Parse JSONB vitals safely
+  const vitalsObj = (data.vitals as Record<string, string> | null) ?? {};
 
   const formattedData: DetailedReferral = {
     id: data.id,
@@ -166,24 +165,24 @@ export async function getReferralById(
       age: patient?.age ? `${patient.age} years` : "N/A",
       sex: formatGender(patient?.sex),
       phone: patient?.phone ?? "N/A",
-      nhiaNumber: patient?.nhia_number ?? "N/A",
+      nhiaNumber: patient?.enrollee_number ?? "N/A",
     },
 
     clinical: {
       chiefComplaint: data.chief_complaint ?? "Refer to attached document",
-      diagnosis: data.diagnosis ?? "Refer to attached document",
+      diagnosis: data.provisional_diagnosis ?? "Refer to attached document",
       clinicalHistory: data.clinical_history ?? "Refer to attached document",
       vitals: {
-        bp: data.bp ?? "--",
-        hr: data.hr ?? "--",
-        temp: data.temp ?? "--",
-        rr: data.rr ?? "--",
-        spO2: data.spo2 ?? "--",
+        bp: vitalsObj.bp ?? "--",
+        hr: vitalsObj.hr ?? "--",
+        temp: vitalsObj.temp ?? "--",
+        rr: vitalsObj.rr ?? "--",
+        spO2: vitalsObj.spo2 ?? "--",
       },
       currentMeds: data.current_medications ?? "",
-      previousMeds: data.previous_medications ?? "",
-      interventions: data.interventions ?? "",
-      reasonForReferral: data.reason_for_referral ?? "",
+      previousMeds: data.previously_administered_medications ?? "",
+      interventions: data.previous_interventions ?? "",
+      reasonForReferral: data.reason ?? "",
       additionalNotes: data.additional_notes ?? "",
     },
 

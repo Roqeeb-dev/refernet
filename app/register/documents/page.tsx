@@ -93,6 +93,7 @@ export default function DocumentsPage() {
               label="CAC Certificate of Incorporation"
               required
               folder="cac-certificates"
+              bucket="facility-documents"
               value={documents.cacCertificateUrl}
               onUploadComplete={(path) =>
                 setDocuments({ cacCertificateUrl: path || undefined })
@@ -102,6 +103,7 @@ export default function DocumentsPage() {
               label="Licence of Operation (State Ministry of Health)"
               required
               folder="operation-licenses"
+              bucket="facility-documents"
               value={documents.operationLicenseUrl}
               onUploadComplete={(path) =>
                 setDocuments({ operationLicenseUrl: path || undefined })
@@ -111,6 +113,7 @@ export default function DocumentsPage() {
               label="MDCN / MDC Practice Certificate"
               required
               folder="practice-certificates"
+              bucket="facility-documents"
               value={documents.practiceCertificateUrl}
               onUploadComplete={(path) =>
                 setDocuments({ practiceCertificateUrl: path || undefined })
