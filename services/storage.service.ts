@@ -1,6 +1,6 @@
 import { supabase } from "@/lib/supabaseClient";
 
-const BUCKET = "facility-documents";
+const DEFAULT_BUCKET = "facility-documents";
 const MAX_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
 const ALLOWED_TYPES = [
   "application/pdf",
@@ -29,7 +29,6 @@ export async function uploadToBucket(
   bucketName: string,
   folderPath: string,
 ) {
-  const fileExt = file.name.split(".").pop();
   const fileName = `${crypto.randomUUID()}-${file.name}`;
   const filePath = `${folderPath}/${fileName}`;
 
@@ -49,36 +48,49 @@ export async function deleteFromBucket(bucketName: string, path: string) {
 export async function uploadFacilityDocument(
   file: File,
   folder: string,
-  bucket: string = "facility-documents",
+  bucket: string = DEFAULT_BUCKET,
 ) {
-  const fileExt = file.name.split(".").pop();
-  const fileName = `${crypto.randomUUID()}-${file.name}`;
-  const filePath = `${folder}/${fileName}`;
-
-  const { data, error } = await supabase.storage
-    .from(bucket)
-    .upload(filePath, file, { upsert: true });
-
-  if (error) return { path: null, error: error.message };
-  return { path: data.path, error: null };
+  return uploadToBucket(file, bucket, folder);
 }
 
 export async function deleteFacilityDocument(
   path: string,
-  bucket: string = "facility-documents",
+  bucket: string = DEFAULT_BUCKET,
 ) {
-  const { error } = await supabase.storage.from(bucket).remove([path]);
-  if (error) console.error("Failed to delete file:", error.message);
+  return deleteFromBucket(bucket, path);
 }
 
-/** Short-lived signed URL for actually viewing a document */
+/** Get a public URL for public buckets (e.g. paper-referrals) */
+export function getPublicDocumentUrl(
+  path: string,
+  bucket: string = "paper-referrals",
+): string | null {
+  if (!path) return null;
+
+  // Clean path to prevent double bucket prefixes or leading slashes
+  const cleanPath = path
+    .replace(new RegExp(`^${bucket}/`), "")
+    .replace(/^\//, "");
+
+  const { data } = supabase.storage.from(bucket).getPublicUrl(cleanPath);
+  return data.publicUrl;
+}
+
+/** Short-lived signed URL for private buckets */
 export async function getSignedDocumentUrl(
   path: string,
+  bucket: string = DEFAULT_BUCKET,
   expiresInSeconds = 60 * 5,
 ): Promise<string | null> {
+  if (!path) return null;
+
+  const cleanPath = path
+    .replace(new RegExp(`^${bucket}/`), "")
+    .replace(/^\//, "");
+
   const { data, error } = await supabase.storage
-    .from(BUCKET)
-    .createSignedUrl(path, expiresInSeconds);
+    .from(bucket)
+    .createSignedUrl(cleanPath, expiresInSeconds);
 
   if (error || !data) return null;
   return data.signedUrl;

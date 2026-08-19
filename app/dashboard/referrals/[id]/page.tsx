@@ -1,4 +1,3 @@
-import { notFound } from "next/navigation";
 import { getReferralById } from "@/services/referral.service";
 import ReferralDetailView from "@/components/new-referral/ReferralDetailView";
 

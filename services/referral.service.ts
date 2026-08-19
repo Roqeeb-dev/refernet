@@ -168,12 +168,18 @@ export async function getReferralById(
   const rawRec = row.receiving_facility;
   const recFacility = Array.isArray(rawRec) ? rawRec[0] : rawRec;
 
-  // Resolve storage path
+  // Resolve storage path safely
   let fileUrl = "";
   if (row.document_path) {
+    // Strip leading bucket name or slashes if accidentally saved in database path
+    const cleanPath = row.document_path
+      .replace(/^paper-referrals\//, "")
+      .replace(/^\//, "");
+
     const { data: publicUrlData } = supabase.storage
       .from("paper-referrals")
-      .getPublicUrl(row.document_path);
+      .getPublicUrl(cleanPath);
+
     fileUrl = publicUrlData.publicUrl;
   }
 

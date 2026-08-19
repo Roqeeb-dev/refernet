@@ -6,6 +6,7 @@ import { ArrowLeft, FileText } from "lucide-react";
 import ReferralHeader from "./ReferralHeader";
 import PatientAndFacilityInfo from "./PatientAndFacilityInfo";
 import ClinicalDetailsSection from "./ClinicalDetailsSection";
+import PaperReferralDetailsSection from "./PaperReferralDetailsSection";
 import AcceptReferralModal from "./AcceptReferralModal";
 import DeclineReferralModal from "./DeclineReferralModal";
 import { DetailedReferral } from "@/lib/referral-types";
@@ -24,6 +25,12 @@ export default function ReferralDetailView({
   const [isAcceptModalOpen, setIsAcceptModalOpen] = useState(false);
   const [isDeclineModalOpen, setIsDeclineModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Discriminator check for Paper vs Digital referral
+  const isPaperReferral =
+    (referral as any).type === "paper" ||
+    Boolean(referral.attachments[0].url) ||
+    referral.patient?.fullName === "Paper Form Attachment";
 
   const currentFacilityId =
     (user?.user_metadata?.facility_id as string | undefined) ??
@@ -105,7 +112,9 @@ export default function ReferralDetailView({
 
           <div className="flex items-center gap-[8px] font-body text-[12px] font-semibold tracking-wider text-slate-400 uppercase">
             <FileText className="h-[16px] w-[16px] text-slate-400" />
-            <span>Referral Details</span>
+            <span>
+              {isPaperReferral ? "Paper Referral Details" : "Referral Details"}
+            </span>
           </div>
         </div>
       </div>
@@ -130,15 +139,22 @@ export default function ReferralDetailView({
           />
         </div>
 
-        <div className="flex flex-col gap-[24px]">
+        {/* View Switch: Paper Document View vs Digital Forms View */}
+        {isPaperReferral ? (
           <div className="overflow-hidden rounded-[12px] border border-gray-200 bg-white shadow-sm">
-            <PatientAndFacilityInfo referral={referral} />
+            <PaperReferralDetailsSection referral={referral} />
           </div>
+        ) : (
+          <div className="flex flex-col gap-[24px]">
+            <div className="overflow-hidden rounded-[12px] border border-gray-200 bg-white shadow-sm">
+              <PatientAndFacilityInfo referral={referral} />
+            </div>
 
-          <div className="overflow-hidden rounded-[12px] border border-gray-200 bg-white shadow-sm">
-            <ClinicalDetailsSection referral={referral} />
+            <div className="overflow-hidden rounded-[12px] border border-gray-200 bg-white shadow-sm">
+              <ClinicalDetailsSection referral={referral} />
+            </div>
           </div>
-        </div>
+        )}
       </main>
 
       {/* Modals rendered strictly if user is receiver */}
