@@ -15,6 +15,12 @@ export interface TimelineStep {
   status: "completed" | "current" | "pending";
 }
 
+export interface FacilityInfo {
+  id?: string;
+  name: string;
+  phone: string;
+}
+
 export interface DetailedReferral {
   id: string;
   referenceNumber: string;
@@ -23,15 +29,13 @@ export interface DetailedReferral {
   urgency: "Emergency" | "Critical" | "Urgent" | "Routine";
   receivedTime: string;
 
-  // Facilities
-  referringFacility: {
-    name: string;
-    phone: string;
-  };
-  receivingFacility: {
-    name: string;
-    phone: string;
-  };
+  // Optional relational IDs from DB/API
+  referring_facility_id?: string;
+  receiving_facility_id?: string;
+
+  // Facilities with id fields
+  referringFacility: FacilityInfo;
+  receivingFacility: FacilityInfo;
 
   // Patient
   patient: {

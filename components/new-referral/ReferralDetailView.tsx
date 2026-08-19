@@ -10,6 +10,7 @@ import AcceptReferralModal from "./AcceptReferralModal";
 import DeclineReferralModal from "./DeclineReferralModal";
 import { DetailedReferral } from "@/lib/referral-types";
 import { acceptReferral, declineReferral } from "@/services/referral.service";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function ReferralDetailView({
   referral: initialReferral,
@@ -17,14 +18,26 @@ export default function ReferralDetailView({
   referral: DetailedReferral;
 }) {
   const router = useRouter();
+  const { user } = useAuth();
+
   const [referral, setReferral] = useState<DetailedReferral>(initialReferral);
   const [isAcceptModalOpen, setIsAcceptModalOpen] = useState(false);
   const [isDeclineModalOpen, setIsDeclineModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const isReceivingFacility = referral.direction === "incoming";
+  const currentFacilityId =
+    (user?.user_metadata?.facility_id as string | undefined) ??
+    (user?.app_metadata?.facility_id as string | undefined);
 
-  // Handle Accept Confirmation
+  const receivingFacilityId =
+    referral.receivingFacility?.id ?? referral.receiving_facility_id;
+
+  const isReceivingFacility = Boolean(
+    currentFacilityId &&
+    receivingFacilityId &&
+    currentFacilityId === receivingFacilityId,
+  );
+
   const handleConfirmAccept = async () => {
     setIsSubmitting(true);
     try {
@@ -47,7 +60,6 @@ export default function ReferralDetailView({
     }
   };
 
-  // Handle Decline Confirmation
   const handleConfirmDecline = async (
     reason: string,
     actionType: "return" | "re-refer",
@@ -79,7 +91,7 @@ export default function ReferralDetailView({
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] pb-[48px]">
-      {/* Top Navigation Bar with Absolute Height */}
+      {/* Top Navigation Bar */}
       <div className="sticky top-0 z-10 h-[56px] border-b border-gray-200 bg-white/90 backdrop-blur-md">
         <div className="mx-auto flex h-full max-w-[1024px] items-center justify-between px-[16px] sm:px-[24px]">
           <button
@@ -100,7 +112,6 @@ export default function ReferralDetailView({
 
       {/* Main Container */}
       <main className="mx-auto mt-[24px] flex max-w-[1024px] flex-col gap-[24px] px-[16px] sm:px-[24px]">
-        {/* Header Card with Explicit Receiver Prop */}
         <div className="overflow-hidden rounded-[12px] border border-gray-200 bg-white shadow-sm">
           <ReferralHeader
             referenceNumber={referral.referenceNumber}
@@ -108,7 +119,7 @@ export default function ReferralDetailView({
             status={referral.status}
             urgency={referral.urgency}
             facilityName={
-              referral.direction === "incoming"
+              isReceivingFacility
                 ? referral.referringFacility.name
                 : referral.receivingFacility.name
             }
@@ -116,11 +127,9 @@ export default function ReferralDetailView({
             isReceiver={isReceivingFacility}
             onAccept={() => setIsAcceptModalOpen(true)}
             onDecline={() => setIsDeclineModalOpen(true)}
-            onCancel={() => console.log("Cancelled referral:", referral.id)}
           />
         </div>
 
-        {/* Details Sections */}
         <div className="flex flex-col gap-[24px]">
           <div className="overflow-hidden rounded-[12px] border border-gray-200 bg-white shadow-sm">
             <PatientAndFacilityInfo referral={referral} />
@@ -132,7 +141,7 @@ export default function ReferralDetailView({
         </div>
       </main>
 
-      {/* Modals rendered conditionally for receiving facility */}
+      {/* Modals rendered strictly if user is receiver */}
       {isReceivingFacility && (
         <>
           <AcceptReferralModal

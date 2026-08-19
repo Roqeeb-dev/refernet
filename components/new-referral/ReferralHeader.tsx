@@ -13,7 +13,6 @@ interface ReferralHeaderProps {
   isReceiver?: boolean;
   onAccept?: () => void;
   onDecline?: () => void;
-  onCancel?: () => void;
 }
 
 export default function ReferralHeader({
@@ -23,14 +22,10 @@ export default function ReferralHeader({
   urgency,
   facilityName,
   receivedTime,
-  isReceiver,
+  isReceiver = false,
   onAccept,
   onDecline,
-  onCancel,
 }: ReferralHeaderProps) {
-  const isIncoming = direction === "incoming";
-  const canTakeReceiverAction = isReceiver ?? isIncoming;
-
   return (
     <div className="flex flex-wrap items-center justify-between gap-base rounded-2xl border border-gray-100 bg-white p-lg shadow-xs">
       <div className="flex flex-col gap-xs">
@@ -49,7 +44,7 @@ export default function ReferralHeader({
 
         <p className="mt-xs font-body text-body-sm text-text-secondary">
           <strong className="font-semibold text-text-primary">
-            {isIncoming ? "From:" : "To:"}
+            {direction === "incoming" ? "From:" : "To:"}
           </strong>{" "}
           {facilityName}
         </p>
@@ -58,7 +53,8 @@ export default function ReferralHeader({
         </p>
       </div>
 
-      {canTakeReceiverAction && (
+      {/* Renders ONLY if isReceiver is true */}
+      {isReceiver && (
         <div className="flex flex-col items-center gap-sm">
           <Button
             variant="outline"
