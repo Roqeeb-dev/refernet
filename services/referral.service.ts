@@ -135,14 +135,16 @@ export async function getReferralById(
         phone,
         enrollee_number
       ),
-      referring_facility:facility_registrations!referring_facility_id (
-        facility_name,
-        phone_number
-      ),
-      receiving_facility:facility_registrations!receiving_facility_id (
-        facility_name,
-        phone_number
-      )
+referring_facility:facility_registrations!referring_facility_id (
+  id,
+  facility_name,
+  phone_number
+),
+receiving_facility:facility_registrations!receiving_facility_id (
+  id,
+  facility_name,
+  phone_number
+)
     `,
     )
     .eq("id", id)
@@ -195,10 +197,12 @@ export async function getReferralById(
     receivedTime: row.created_at,
 
     referringFacility: {
+      id: refFacility?.id,
       name: refFacility?.facility_name ?? "Unknown Facility",
       phone: refFacility?.phone_number ?? "N/A",
     },
     receivingFacility: {
+      id: recFacility?.id,
       name: recFacility?.facility_name ?? "Unknown Facility",
       phone: recFacility?.phone_number ?? "N/A",
     },

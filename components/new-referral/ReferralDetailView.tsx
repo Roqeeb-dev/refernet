@@ -11,7 +11,7 @@ import AcceptReferralModal from "./AcceptReferralModal";
 import DeclineReferralModal from "./DeclineReferralModal";
 import { DetailedReferral } from "@/lib/referral-types";
 import { acceptReferral, declineReferral } from "@/services/referral.service";
-import { useAuth } from "@/hooks/useAuth";
+import { useFacility } from "@/hooks/useFacility";
 
 export default function ReferralDetailView({
   referral: initialReferral,
@@ -19,7 +19,7 @@ export default function ReferralDetailView({
   referral: DetailedReferral;
 }) {
   const router = useRouter();
-  const { user } = useAuth();
+  const { facility, isLoading: isFacilityLoading } = useFacility();
 
   const [referral, setReferral] = useState<DetailedReferral>(initialReferral);
   const [isAcceptModalOpen, setIsAcceptModalOpen] = useState(false);
@@ -29,17 +29,17 @@ export default function ReferralDetailView({
   // Discriminator check for Paper vs Digital referral
   const isPaperReferral =
     (referral as any).type === "paper" ||
-    Boolean(referral.attachments[0].url) ||
+    Boolean(referral.attachments?.[0]?.url) ||
     referral.patient?.fullName === "Paper Form Attachment";
 
-  const currentFacilityId =
-    (user?.user_metadata?.facility_id as string | undefined) ??
-    (user?.app_metadata?.facility_id as string | undefined);
+  // Lookup current facility ID via facility_registrations database query
+  const currentFacilityId = facility?.id;
 
   const receivingFacilityId =
     referral.receivingFacility?.id ?? referral.receiving_facility_id;
 
   const isReceivingFacility = Boolean(
+    !isFacilityLoading &&
     currentFacilityId &&
     receivingFacilityId &&
     currentFacilityId === receivingFacilityId,
