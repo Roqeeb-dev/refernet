@@ -110,7 +110,7 @@ export default function FacilityShowcase() {
               </p>
             </div>
             <Link
-              href="#guided-care"
+              href="/find-care/guided-care"
               aria-label="Start guided care"
               className="mt-base inline-flex h-10 w-10 items-center justify-center rounded-full bg-green-500 text-text-inverse transition-colors hover:bg-green-700"
             >
