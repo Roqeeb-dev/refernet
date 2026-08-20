@@ -1,6 +1,13 @@
 import React from "react";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import AdminTopbar from "@/components/admin/AdminTopbar";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Admin Portal",
+  description:
+    "Manage platform settings, facility registrations, and system configurations.",
+};
 
 export default function AdminLayout({
   children,

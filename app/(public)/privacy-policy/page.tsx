@@ -1,6 +1,13 @@
 import LegalPageLayout, {
   LegalSection,
 } from "@/components/legal/LegalPageLayout";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  description:
+    "Read our privacy policy regarding data collection and security on ReferNet Nigeria.",
+};
 
 const SECTIONS: LegalSection[] = [
   {

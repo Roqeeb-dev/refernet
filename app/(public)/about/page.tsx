@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowLeft, MapPin, ClipboardList, ShieldCheck } from "lucide-react";
+import type { Metadata } from "next";
 
 const STATS = [
   {
@@ -35,6 +36,12 @@ const PILLARS = [
     body: "Every referral maintains a timestamped audit trail — from creation through acceptance, arrival, outcome, and closure — so facilities have real visibility into every handoff.",
   },
 ];
+
+export const metadata: Metadata = {
+  title: "About Us",
+  description:
+    "Learn how ReferNet Nigeria is connecting healthcare facilities to improve patient care.",
+};
 
 export default function AboutPage() {
   return (

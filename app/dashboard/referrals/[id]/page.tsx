@@ -1,5 +1,12 @@
 import { getReferralById } from "@/services/referral.service";
 import ReferralDetailView from "@/components/new-referral/ReferralDetailView";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Referral Details",
+  description:
+    "View full clinical details, patient info, and status history for this referral.",
+};
 
 interface PageProps {
   params: Promise<{ id: string }>;
