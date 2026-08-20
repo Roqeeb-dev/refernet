@@ -23,7 +23,6 @@ export default function EmergencyPage() {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
-        // Navigates to results; Next.js automatically mounts loading.tsx while fetching
         router.push(
           `/find-care/emergency/results?lat=${latitude}&lng=${longitude}`,
         );
@@ -47,7 +46,11 @@ export default function EmergencyPage() {
             break;
         }
       },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
+      {
+        enableHighAccuracy: false,
+        timeout: 15000,
+        maximumAge: 60000,
+      },
     );
   }
 

@@ -13,26 +13,28 @@ export default function FacilityResultsClient() {
 
   if (error) {
     return (
-      <div className="p-xl text-center text-text-secondary">
+      <div className="mx-auto max-w-7xl px-4 py-12 text-center font-body text-gray-500">
         Failed to fetch nearby facilities. Please try again.
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-base p-lg">
-      <div className="flex items-center justify-between">
+    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      {/* Header Bar */}
+      <div className="mb-6 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="font-display text-heading-lg font-bold">
+          <h1 className="font-display text-2xl font-bold text-gray-900 sm:text-3xl">
             Nearby Emergency Facilities
           </h1>
-          <p className="font-body text-body-sm text-text-secondary">
+          <p className="font-body text-sm text-gray-500">
             Showing {facilities.length} facilities near your location
           </p>
         </div>
       </div>
 
-      <div className="flex flex-col gap-base">
+      {/* Responsive Grid Layout */}
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {facilities.map((facility) => (
           <FacilityCard key={facility.id} facility={facility} />
         ))}
