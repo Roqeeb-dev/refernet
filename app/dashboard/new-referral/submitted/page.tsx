@@ -24,9 +24,12 @@ function SubmittedPageContent() {
     async function fetchReferral() {
       try {
         setLoading(true);
-        const data = await getReferralById(referralId!);
-        if (!data) {
-          setError("Referral record not found.");
+        const { data, error: serviceError } = await getReferralById(
+          referralId!,
+        );
+
+        if (serviceError || !data) {
+          setError(serviceError || "Referral record not found.");
         } else {
           setReferral(data);
         }
@@ -56,31 +59,34 @@ function SubmittedPageContent() {
     );
   }
 
-  // Determine paper vs digital by inspecting attachments array
-  const hasAttachments =
-    referral.attachments && referral.attachments.length > 0;
+  const hasAttachments = Boolean(
+    referral.attachments && referral.attachments.length > 0,
+  );
   const isPaper = hasAttachments;
   const firstAttachmentName = hasAttachments
-    ? referral.attachments[0].name
+    ? referral.attachments[0]?.name
     : undefined;
 
-  // Format receivedTime safely
-  const formattedDate = referral.receivedTime
-    ? new Date(referral.receivedTime).toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-      })
-    : "N/A";
+  let formattedDate = "N/A";
+  if (referral.receivedTime) {
+    const parsedDate = new Date(referral.receivedTime);
+    formattedDate = !isNaN(parsedDate.getTime())
+      ? parsedDate.toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        })
+      : referral.receivedTime;
+  }
 
   const submittedData = {
     type: isPaper ? ("paper" as const) : ("digital" as const),
-    referenceNumber: referral.referenceNumber,
-    patientName: referral.patient.fullName,
-    facilityName: referral.receivingFacility.name,
+    referenceNumber: referral.referenceNumber || "N/A",
+    patientName: referral.patient?.fullName || "Unknown Patient",
+    facilityName: referral.receivingFacility?.name || "Unknown Facility",
     submittedAt: formattedDate,
     fileName: firstAttachmentName,
     referralId: referral.id,

@@ -10,9 +10,9 @@ interface ReferralHeaderProps {
   urgency: string;
   facilityName: string;
   receivedTime: string;
+  isReceiver?: boolean;
   onAccept?: () => void;
   onDecline?: () => void;
-  onCancel?: () => void;
 }
 
 export default function ReferralHeader({
@@ -22,11 +22,11 @@ export default function ReferralHeader({
   urgency,
   facilityName,
   receivedTime,
+  isReceiver,
   onAccept,
   onDecline,
-  onCancel,
 }: ReferralHeaderProps) {
-  const isIncoming = direction === "incoming";
+  const showActionButtons = isReceiver && status?.toLowerCase() === "pending";
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-base rounded-2xl border border-gray-100 bg-white p-lg shadow-xs">
@@ -36,17 +36,17 @@ export default function ReferralHeader({
         </div>
 
         <div className="flex flex-wrap items-center gap-xs">
-          <span className="rounded-full bg-blue-50 px-sm py-[2px] font-body text-caption font-semibold text-blue-700 border border-blue-200">
+          <span className="rounded-full border border-blue-200 bg-blue-50 px-sm py-[2px] font-body text-caption font-semibold capitalize text-blue-700">
             ● {status}
           </span>
-          <span className="rounded-full bg-red-50 px-sm py-[2px] font-body text-caption font-semibold text-red-700 border border-red-200">
+          <span className="rounded-full border border-red-200 bg-red-50 px-sm py-[2px] font-body text-caption font-semibold capitalize text-red-700">
             ● {urgency}
           </span>
         </div>
 
         <p className="mt-xs font-body text-body-sm text-text-secondary">
           <strong className="font-semibold text-text-primary">
-            {isIncoming ? "From:" : "To:"}
+            {direction === "incoming" ? "From:" : "To:"}
           </strong>{" "}
           {facilityName}
         </p>
@@ -55,42 +55,25 @@ export default function ReferralHeader({
         </p>
       </div>
 
-      <div className="flex flex-col items-center gap-sm">
-        {isIncoming ? (
-          <>
-            <Button
-              variant="outline"
-              onClick={onDecline}
-              className="border-red-200 bg-red-50/50 text-red-700 hover:bg-red-100"
-            >
-              ✕ Decline Referral
-            </Button>
-            <Button
-              variant="primary"
-              onClick={onAccept}
-              className="bg-emerald-700 hover:bg-emerald-800"
-            >
-              ✓ Accept Referral
-            </Button>
-          </>
-        ) : (
-          <>
-            <Button
-              variant="outline"
-              onClick={onCancel}
-              className="border-gray-200 text-text-secondary hover:bg-gray-50"
-            >
-              Cancel Referral
-            </Button>
-            <Button
-              variant="primary"
-              className="bg-emerald-700 hover:bg-emerald-800"
-            >
-              Print Referral Slip
-            </Button>
-          </>
-        )}
-      </div>
+      {/* Renders ONLY if user is receiver AND status is pending */}
+      {showActionButtons && (
+        <div className="flex items-center gap-sm sm:flex-row">
+          <Button
+            variant="outline"
+            onClick={onDecline}
+            className="border-red-200 bg-red-50/50 text-red-700 hover:bg-red-100"
+          >
+            ✕ Decline
+          </Button>
+          <Button
+            variant="primary"
+            onClick={onAccept}
+            className="bg-emerald-700 text-white hover:bg-emerald-800"
+          >
+            ✓ Accept Referral
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

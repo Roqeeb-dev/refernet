@@ -2,7 +2,7 @@ import { supabase } from "@/lib/supabaseClient";
 import type { Facility } from "@/lib/facility";
 import { getMyFacilityId } from "@/lib/getMyFacilityId";
 import type { ReferralRow } from "@/components/dashboard/ReferralsTable";
-import type { DetailedReferral } from "@/lib/referral-types";
+import type { DetailedReferral, ReferralStatus } from "@/lib/referral-types";
 
 export interface SubmitPaperReferralInput {
   documentPath: string;
@@ -72,6 +72,40 @@ export interface GetReferralByIdResult {
   error: string | null;
 }
 
+// Add an explicit type for the raw database query result
+type ReferralWithRelations = {
+  id: string;
+  reference_number: string | null;
+  document_path: string | null;
+  status: ReferralStatus | null;
+  urgency_level: "Emergency" | "Critical" | "Urgent" | "Routine" | null;
+  created_at: string;
+  chief_complaint: string | null;
+  provisional_diagnosis: string | null;
+  clinical_history: string | null;
+  vitals: Record<string, string> | null;
+  current_medications: string | null;
+  previously_administered_medications: string | null;
+  previous_interventions: string | null;
+  reason: string | null;
+  additional_notes: string | null;
+  patients: {
+    full_name: string;
+    age: number | null;
+    sex: string | null;
+    phone: string | null;
+    enrollee_number: string | null;
+  } | null;
+  referring_facility: {
+    facility_name: string;
+    phone_number: string | null;
+  } | null;
+  receiving_facility: {
+    facility_name: string;
+    phone_number: string | null;
+  } | null;
+};
+
 export async function getReferralById(
   id: string,
 ): Promise<GetReferralByIdResult> {
@@ -86,37 +120,35 @@ export async function getReferralById(
       urgency_level,
       created_at,
       chief_complaint,
-      diagnosis,
+      provisional_diagnosis,
       clinical_history,
+      vitals,
       current_medications,
-      previous_medications,
-      interventions,
-      reason_for_referral,
+      previously_administered_medications,
+      previous_interventions,
+      reason,
       additional_notes,
-      bp,
-      hr,
-      temp,
-      rr,
-      spo2,
-      patients!patient_id (
+      patients!left (
         full_name,
         age,
         sex,
         phone,
-        nhia_number
+        enrollee_number
       ),
-      referring_facility:facility_registrations!referring_facility_id (
-        facility_name,
-        phone_number
-      ),
-      receiving_facility:facility_registrations!receiving_facility_id (
-        facility_name,
-        phone_number
-      )
+referring_facility:facility_registrations!referring_facility_id (
+  id,
+  facility_name,
+  phone_number
+),
+receiving_facility:facility_registrations!receiving_facility_id (
+  id,
+  facility_name,
+  phone_number
+)
     `,
     )
     .eq("id", id)
-    .single();
+    .maybeSingle();
 
   if (error || !data) {
     return {
@@ -125,38 +157,52 @@ export async function getReferralById(
     };
   }
 
-  const patient = Array.isArray(data.patients)
-    ? data.patients[0]
-    : data.patients;
-  const refFacility = Array.isArray(data.referring_facility)
-    ? data.referring_facility[0]
-    : data.referring_facility;
-  const recFacility = Array.isArray(data.receiving_facility)
-    ? data.receiving_facility[0]
-    : data.receiving_facility;
+  // Safely cast to our explicit response shape
+  const row = data as unknown as ReferralWithRelations;
 
-  // Resolve storage path to a usable Supabase URL
+  // Handle relation results safely whether returned as an object or array
+  const rawPatient = row.patients;
+  const patient = Array.isArray(rawPatient) ? rawPatient[0] : rawPatient;
+
+  const rawRef = row.referring_facility;
+  const refFacility = Array.isArray(rawRef) ? rawRef[0] : rawRef;
+
+  const rawRec = row.receiving_facility;
+  const recFacility = Array.isArray(rawRec) ? rawRec[0] : rawRec;
+
+  // Resolve storage path safely
   let fileUrl = "";
-  if (data.document_path) {
+  if (row.document_path) {
+    // Strip leading bucket name or slashes if accidentally saved in database path
+    const cleanPath = row.document_path
+      .replace(/^paper-referrals\//, "")
+      .replace(/^\//, "");
+
     const { data: publicUrlData } = supabase.storage
       .from("paper-referrals")
-      .getPublicUrl(data.document_path);
+      .getPublicUrl(cleanPath);
+
     fileUrl = publicUrlData.publicUrl;
   }
 
+  // Parse JSONB vitals safely
+  const vitalsObj = row.vitals ?? {};
+
   const formattedData: DetailedReferral = {
-    id: data.id,
-    referenceNumber: data.reference_number ?? `RN-${data.id.slice(0, 4)}`,
+    id: row.id,
+    referenceNumber: row.reference_number ?? `RN-${row.id.slice(0, 4)}`,
     direction: "incoming",
-    status: data.status ?? "New",
-    urgency: data.urgency_level ?? "Routine",
-    receivedTime: formatReceivedAt(data.created_at),
+    status: row.status ?? "New",
+    urgency: row.urgency_level ?? "Routine",
+    receivedTime: row.created_at,
 
     referringFacility: {
+      id: refFacility?.id,
       name: refFacility?.facility_name ?? "Unknown Facility",
       phone: refFacility?.phone_number ?? "N/A",
     },
     receivingFacility: {
+      id: recFacility?.id,
       name: recFacility?.facility_name ?? "Unknown Facility",
       phone: recFacility?.phone_number ?? "N/A",
     },
@@ -164,33 +210,34 @@ export async function getReferralById(
     patient: {
       fullName: patient?.full_name ?? "Paper Form Attachment",
       age: patient?.age ? `${patient.age} years` : "N/A",
-      sex: formatGender(patient?.sex),
+      sex: patient?.sex ?? "N/A",
       phone: patient?.phone ?? "N/A",
-      nhiaNumber: patient?.nhia_number ?? "N/A",
+      nhiaNumber: patient?.enrollee_number ?? "N/A",
     },
 
     clinical: {
-      chiefComplaint: data.chief_complaint ?? "Refer to attached document",
-      diagnosis: data.diagnosis ?? "Refer to attached document",
-      clinicalHistory: data.clinical_history ?? "Refer to attached document",
+      chiefComplaint: row.chief_complaint ?? "Refer to attached document",
+      diagnosis: row.provisional_diagnosis ?? "Refer to attached document",
+      clinicalHistory: row.clinical_history ?? "Refer to attached document",
       vitals: {
-        bp: data.bp ?? "--",
-        hr: data.hr ?? "--",
-        temp: data.temp ?? "--",
-        rr: data.rr ?? "--",
-        spO2: data.spo2 ?? "--",
+        bp: vitalsObj.bp ?? "--",
+        hr: vitalsObj.hr ?? "--",
+        temp: vitalsObj.temp ?? "--",
+        rr: vitalsObj.rr ?? "--",
+        spO2: vitalsObj.spo2 ?? "--",
       },
-      currentMeds: data.current_medications ?? "",
-      previousMeds: data.previous_medications ?? "",
-      interventions: data.interventions ?? "",
-      reasonForReferral: data.reason_for_referral ?? "",
-      additionalNotes: data.additional_notes ?? "",
+      currentMeds: row.current_medications ?? "",
+      previousMeds: row.previously_administered_medications ?? "",
+      interventions: row.previous_interventions ?? "",
+      reasonForReferral: row.reason ?? "",
+      additionalNotes: row.additional_notes ?? "",
     },
 
     attachments: fileUrl
       ? [
           {
-            name: extractFileName(data.document_path),
+            name:
+              row.document_path?.split("/").pop() || "attached-document.pdf",
             url: fileUrl,
           },
         ]
@@ -199,7 +246,7 @@ export async function getReferralById(
     timeline: [
       {
         title: "Sent by referring facility",
-        time: formatReceivedAt(data.created_at),
+        time: row.created_at,
         status: "completed",
       },
     ],

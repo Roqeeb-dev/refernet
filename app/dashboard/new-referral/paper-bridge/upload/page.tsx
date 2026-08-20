@@ -17,10 +17,19 @@ export default function UploadPaperReferral() {
   const router = useRouter();
 
   const draftReferralId = usePaperReferralDraftStore((s) => s.draftReferralId);
+  const setDocumentPathInStore = usePaperReferralDraftStore(
+    (s) => s.setDocumentPath,
+  );
+
   const [documentPath, setDocumentPath] = useState("");
   const [confirmed, setConfirmed] = useState(false);
 
   const canContinue = !!documentPath && confirmed;
+
+  const handleUploadComplete = (path: string) => {
+    setDocumentPath(path);
+    setDocumentPathInStore(path);
+  };
 
   function handleNext() {
     if (!canContinue) return;
@@ -73,7 +82,7 @@ export default function UploadPaperReferral() {
             bucket="paper-referrals"
             folder={draftReferralId}
             value={documentPath}
-            onUploadComplete={setDocumentPath}
+            onUploadComplete={handleUploadComplete}
           />
         ) : (
           <div className="flex min-h-[140px] items-center justify-center rounded-lg border-2 border-dashed border-gray-200 bg-white">

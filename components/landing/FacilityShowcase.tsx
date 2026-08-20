@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
 const TILES = [
   {
@@ -48,13 +49,13 @@ export default function FacilityShowcase() {
           </h2>
         </div>
 
-        {/* Tile grid: big tile spans both rows on col 1, remaining 4 cells fill 2x2 */}
+        {/* Tile grid */}
         <div className="grid grid-cols-1 gap-lg sm:grid-cols-3 sm:grid-rows-2 sm:h-[520px]">
           {TILES.map((tile) =>
             tile.span === "big" ? (
               <div
                 key={tile.key}
-                className="group relative min-h-[240px] overflow-hidden rounded-lg sm:row-span-2 sm:min-h-0"
+                className="group relative min-h-[240px] overflow-hidden rounded-2xl sm:row-span-2 sm:min-h-0"
               >
                 <Image
                   src={tile.image}
@@ -76,7 +77,7 @@ export default function FacilityShowcase() {
             ) : (
               <div
                 key={tile.key}
-                className="group relative min-h-[140px] overflow-hidden rounded-lg sm:min-h-0"
+                className="group relative min-h-[140px] overflow-hidden rounded-2xl sm:min-h-0"
               >
                 <Image
                   src={tile.image}
@@ -98,32 +99,30 @@ export default function FacilityShowcase() {
             ),
           )}
 
-          {/* CTA tile */}
-          <div className="flex min-h-[140px] flex-col justify-between rounded-lg bg-green-900 p-lg sm:min-h-0">
-            <div>
-              <h3 className="mb-xs font-display text-heading-sm font-bold text-text-inverse">
-                Not sure where to go?
-              </h3>
-              <p className="font-body text-body-sm text-green-100">
-                Our guided care tool finds the right facility level for your
-                symptoms — no medical knowledge needed.
-              </p>
+          <div className="relative flex h-full w-full flex-col justify-between overflow-hidden rounded-2xl bg-[#06331A] p-6 text-white shadow-sm sm:min-h-0">
+            {/* Decorative background circles */}
+            <div className="pointer-events-none absolute -top-12 -right-12 h-[176px] w-[176px] rounded-full bg-white/[0.04]" />
+            <div className="pointer-events-none absolute -bottom-10 -left-10 h-[128px] w-[128px] rounded-full bg-white/[0.04]" />
+
+            <div className="relative z-10 flex h-full flex-col justify-between">
+              <div>
+                <h3 className="mb-2 font-display text-xl font-bold tracking-tight text-white sm:text-2xl">
+                  Not sure where to go?
+                </h3>
+                <p className="font-body text-xs font-normal leading-relaxed text-emerald-100/70 sm:text-sm">
+                  Our guided care tool finds the right facility level for your
+                  symptoms — no medical knowledge needed.
+                </p>
+              </div>
+
+              <Link
+                href="/find-care/guided-care"
+                aria-label="Start guided care"
+                className="mt-4 inline-flex h-[44px] w-[44px] items-center justify-center rounded-full bg-[#A8E6CF] text-[#06331A] transition-transform hover:scale-105 active:scale-95"
+              >
+                <ArrowRight size={20} strokeWidth={2.2} />
+              </Link>
             </div>
-            <Link
-              href="#guided-care"
-              aria-label="Start guided care"
-              className="mt-base inline-flex h-10 w-10 items-center justify-center rounded-full bg-green-500 text-text-inverse transition-colors hover:bg-green-700"
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M5 12H19M19 12L13 6M19 12L13 18"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </Link>
           </div>
         </div>
       </div>

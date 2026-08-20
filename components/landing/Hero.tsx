@@ -38,13 +38,13 @@ export default function Hero() {
 
               <div className="flex flex-wrap gap-sm sm:gap-base">
                 <Link
-                  href="#facilities"
+                  href="/facilities"
                   className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-green-500 px-xl text-center font-body text-body-md font-semibold text-text-inverse transition-colors hover:bg-green-700"
                 >
                   Find Facilities Nearby
                 </Link>
                 <Link
-                  href="/emergency"
+                  href="/find-care/emergency"
                   className="inline-flex min-h-[48px] items-center justify-center rounded-full border border-white/40 px-xl text-center font-body text-body-md font-semibold text-text-inverse transition-colors hover:bg-white/10"
                 >
                   Emergency Help Request
