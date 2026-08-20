@@ -1,47 +1,35 @@
 import { Phone } from "lucide-react";
 import Button from "@/components/shared/Button";
-
-export type FacilityStatus =
-  | "OPEN_ACCEPTING"
-  | "LIMITED"
-  | "EMERGENCY_ONLY"
-  | "UNAVAILABLE";
-
-export interface Facility {
-  id: string;
-  name: string;
-  type: string;
-  status: FacilityStatus;
-  address: string;
-  phone: string;
-  distanceKm: number;
-  lastUpdated: string;
-}
+import type { Facility, FacilityStatus } from "@/lib/facility";
 
 const STATUS_CONFIG: Record<
   FacilityStatus,
   { label: string; badgeClass: string }
 > = {
-  OPEN_ACCEPTING: {
+  accepting: {
     label: "Open & Accepting",
     badgeClass: "bg-green-100 text-green-700",
   },
-  LIMITED: {
+  limited: {
     label: "Limited Capacity",
     badgeClass: "bg-urgent-light text-urgent",
   },
-  EMERGENCY_ONLY: {
+  emergency_only: {
     label: "Emergency Only",
     badgeClass: "bg-[#FDECE0] text-status-emergency-only",
   },
-  UNAVAILABLE: {
+  unavailable: {
     label: "Unavailable",
     badgeClass: "bg-emergency-light text-emergency",
   },
 };
 
 export default function FacilityCard({ facility }: { facility: Facility }) {
-  const status = STATUS_CONFIG[facility.status];
+  // Fallback to "accepting" if the DB returns an unexpected string
+  const statusKey = STATUS_CONFIG[facility.status]
+    ? facility.status
+    : "accepting";
+  const status = STATUS_CONFIG[statusKey];
 
   return (
     <div className="rounded-lg border border-gray-100 bg-white p-base">

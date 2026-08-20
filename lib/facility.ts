@@ -4,6 +4,9 @@ export type FacilityAvailabilityStatus =
   | "emergency_only"
   | "unavailable";
 
+// Alias to maintain backwards compatibility across components using FacilityStatus
+export type FacilityStatus = FacilityAvailabilityStatus;
+
 export interface FacilityAvailabilityOption {
   value: FacilityAvailabilityStatus;
   label: string;
@@ -80,7 +83,8 @@ export const FACILITY_TYPE_OPTIONS: FacilityTypeOption[] = [
   { value: "tertiary_hospital", label: "Tertiary Hospital" },
 ];
 
-export function getFacilityTypeLabel(value: FacilityType): string {
+export function getFacilityTypeLabel(value?: string | null): string {
+  if (!value) return "General Hospital";
   return (
     FACILITY_TYPE_OPTIONS.find((option) => option.value === value)?.label ??
     value
@@ -90,10 +94,12 @@ export function getFacilityTypeLabel(value: FacilityType): string {
 export interface Facility {
   id: string;
   name: string;
-  type: FacilityType;
-  distanceKm: number;
-  address: string;
-  updatedMinutesAgo: number;
+  type: string;
   status: FacilityAvailabilityStatus;
+  address: string;
+  phone: string;
+  distanceKm: number;
+  lastUpdated: string;
+  updatedMinutesAgo?: number;
   note?: string;
 }

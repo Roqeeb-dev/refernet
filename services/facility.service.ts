@@ -1,5 +1,9 @@
 import { supabase } from "@/lib/supabaseClient";
-import type { Facility, FacilityAvailabilityStatus } from "@/lib/facility";
+import type {
+  Facility,
+  FacilityAvailabilityStatus,
+  FacilityStatus,
+} from "@/lib/facility";
 
 export type ApprovalStatus = "pending_review" | "approved" | "rejected";
 export type AvailabilityStatus = FacilityAvailabilityStatus;
@@ -45,13 +49,6 @@ interface ServiceResult<T> {
   error: string | null;
 }
 
-// Helper: Calculate elapsed minutes from timestamp
-function calculateMinutesAgo(updatedAt?: string): number | undefined {
-  if (!updatedAt) return undefined;
-  const diffMs = Date.now() - new Date(updatedAt).getTime();
-  return Math.max(0, Math.floor(diffMs / (1000 * 60)));
-}
-
 // Helper: Format raw DB row into Facility UI interface
 function mapToFacility(item: FacilityRegistration): Facility {
   const addressParts = [item.street_address, item.lga, item.state].filter(
@@ -59,13 +56,19 @@ function mapToFacility(item: FacilityRegistration): Facility {
   );
 
   return {
-    id: item.id, // Real database UUID
+    id: item.id,
     name: item.facility_name ?? "Unknown Facility",
-    type: item.facility_type ?? "general_hospital",
+    type: item.facility_type ?? "General Hospital",
     address: addressParts.join(", ") || "Address unavailable",
-    status: item.availability_status ?? "accepting",
-    note: item.availability_note ?? undefined,
-    updatedMinutesAgo: calculateMinutesAgo(item.availability_updated_at),
+    phone: item.phone_number ?? item.contact_phone ?? "N/A",
+    status: (item.availability_status as FacilityStatus) ?? "accepting",
+    distanceKm: 1.2, // Replace with dynamic distance calculation when available
+    lastUpdated: item.availability_updated_at
+      ? new Date(item.availability_updated_at).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      : "Recently",
   };
 }
 

@@ -1,5 +1,4 @@
-import { redirect, notFound } from "next/navigation";
-import { getNearbyEmergencyFacilities } from "@/services/facilities.service";
+import { redirect } from "next/navigation";
 import FacilityResultsClient from "./FacilityResultClient";
 
 interface PageProps {
@@ -15,14 +14,5 @@ export default async function EmergencyResultsPage({
     redirect("/find-care/emergency");
   }
 
-  const facilities = await getNearbyEmergencyFacilities(
-    parseFloat(lat),
-    parseFloat(lng),
-  );
-
-  if (facilities.length === 0) {
-    notFound(); // renders results/not-found.tsx
-  }
-
-  return <FacilityResultsClient initialFacilities={facilities} />;
+  return <FacilityResultsClient />;
 }
