@@ -2,13 +2,6 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import type { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "Find Care",
-  description:
-    "Find the right level of healthcare facility for your symptoms with our guided care tool and emergency service.",
-};
 
 const TABS = [
   {
