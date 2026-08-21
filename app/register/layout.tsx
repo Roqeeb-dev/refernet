@@ -1,5 +1,12 @@
 import RegistrationHeader from "@/components/register/RegistrationHeader";
 import RegistrationHydration from "@/components/register/RegistrationHydration";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Register Facility",
+  description:
+    "Create a new facility account to send and receive electronic referrals across Nigeria.",
+};
 
 export default function RegisterLayout({
   children,

@@ -1,6 +1,13 @@
 import LegalPageLayout, {
   LegalSection,
 } from "@/components/legal/LegalPageLayout";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Terms of Service",
+  description:
+    "Terms and conditions governing the use of the ReferNet platform.",
+};
 
 const SECTIONS: LegalSection[] = [
   {

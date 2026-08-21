@@ -1,19 +1,16 @@
 import DashboardShell from "@/components/dashboard/DashboardShell";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Dashboard",
+  description:
+    "Overview of your facility's active referrals, status updates, and care activity.",
+};
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // TODO: replace with the authenticated facility's real data
-  // (facility name, live status value, and last-updated timestamp)
-  return (
-    <DashboardShell
-      facilityName="Lagos University Teaching Hospital"
-      status="accepting"
-      lastUpdated="13:08"
-    >
-      {children}
-    </DashboardShell>
-  );
+  return <DashboardShell facilityName="">{children}</DashboardShell>;
 }

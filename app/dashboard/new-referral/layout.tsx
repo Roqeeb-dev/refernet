@@ -1,6 +1,13 @@
 import Link from "next/link";
 import { X } from "lucide-react";
 import Logo from "@/components/shared/Logo";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "New Referral",
+  description:
+    "Create and dispatch a new patient referral to another healthcare facility.",
+};
 
 export default function NewReferralLayout({
   children,

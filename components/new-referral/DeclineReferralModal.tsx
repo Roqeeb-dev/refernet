@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Button from "@/components/shared/Button";
-import FacilitySelector, { Facility } from "./FacilitySelector";
+import FacilitySelector from "./FacilitySelector";
+import { Facility } from "@/lib/facility";
 import DeclineSuccessModal from "./DeclineSuccessModal";
 
 interface DeclineReferralModalProps {
