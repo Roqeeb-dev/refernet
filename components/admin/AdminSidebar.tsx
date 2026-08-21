@@ -40,7 +40,7 @@ export default function AdminSidebar() {
     },
     {
       name: "Audit Log",
-      href: "/admin/audit",
+      href: "/admin/audit-log",
       icon: FileText,
     },
     {

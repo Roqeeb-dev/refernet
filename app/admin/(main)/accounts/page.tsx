@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Plus, Search, Bell } from "lucide-react";
+import { Plus, Search, Bell, UserX } from "lucide-react";
 import Button from "@/components/shared/Button";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { AdminProfile } from "@/types/admin";
@@ -13,9 +13,9 @@ import {
 import EditAdminModal from "@/components/admin/EditAdminModal";
 import AdminTableRow from "@/components/admin/AdminTableRow";
 import {
-  AdminLoadingState,
-  AdminErrorState,
-  AdminEmptyState,
+  PageLoadingState,
+  PageErrorState,
+  PageEmptyState,
 } from "@/components/admin/AdminPageStates";
 
 import {
@@ -129,12 +129,20 @@ export default function AdminAccountsPage() {
         </div>
 
         {/* Dynamic States */}
-        {isLoading && <AdminLoadingState />}
+        {isLoading && <PageLoadingState message="Loading admin accounts..." />}
         {!isLoading && errorMsg && (
-          <AdminErrorState errorMsg={errorMsg} onRetry={loadAdmins} />
+          <PageErrorState
+            title="Failed to load accounts"
+            errorMsg={errorMsg}
+            onRetry={loadAdmins}
+          />
         )}
         {!isLoading && !errorMsg && filteredAdmins.length === 0 && (
-          <AdminEmptyState searchQuery={searchQuery} />
+          <PageEmptyState
+            title="No Admin Accounts Found"
+            searchQuery={searchQuery}
+            icon={UserX}
+          />
         )}
 
         {/* Table View */}
