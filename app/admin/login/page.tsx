@@ -2,24 +2,51 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import AuthLeftPanel from "@/components/admin/AuthLeftPanel";
 import Input from "@/components/shared/Input";
 import Button from "@/components/shared/Button";
+import { loginAdmin } from "@/services/admin-auth.service";
+import { logAdminAction } from "@/services/admin-audit.service";
+import { useAdminAuthStore } from "@/store/useAdminStore";
 
 export default function AdminLoginPage() {
+  const router = useRouter();
+  const setAdmin = useAdminAuthStore((s) => s.setAdmin);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMsg("");
     setIsSubmitting(true);
 
     try {
-      console.log("Admin Logging in:", { email, password });
-    } catch (err) {
-      console.error(err);
+      const { profile, error } = await loginAdmin({ email, password });
+
+      if (error || !profile) {
+        setErrorMsg(error || "Failed to sign in.");
+        setIsSubmitting(false);
+        return;
+      }
+
+      // 1. Update central store state
+      setAdmin(profile);
+
+      // 2. Capture audit log for successful login
+      await logAdminAction({
+        action: "Login Event",
+        description: `Admin ${profile.fullName} logged in.`,
+      });
+
+      // 3. Redirect to Admin Dashboard
+      router.push("/admin/dashboard");
+    } catch (err: any) {
+      setErrorMsg(err?.message || "An unexpected error occurred.");
     } finally {
       setIsSubmitting(false);
     }
@@ -55,6 +82,16 @@ export default function AdminLoginPage() {
                 Internal use only. Unauthorised access is prohibited.
               </p>
             </div>
+
+            {/* Error Message Banner */}
+            {errorMsg && (
+              <div
+                role="alert"
+                className="mt-md rounded-xl bg-red-50 p-sm border border-red-200 font-body text-caption font-bold text-red-700"
+              >
+                {errorMsg}
+              </div>
+            )}
 
             {/* Form Fields */}
             <form
