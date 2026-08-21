@@ -183,6 +183,7 @@ export default function AdminAccountsPage() {
       {/* Edit Modal Component */}
       {selectedAdmin && (
         <EditAdminModal
+          key={selectedAdmin.id}
           admin={selectedAdmin}
           currentAdminId={currentAdmin?.id}
           isOpen={isEditModalOpen}
