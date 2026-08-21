@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Logo from "@/components/shared/Logo";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
+import { getInitials, formatRole } from "@/lib/admin-display";
 import {
   LayoutDashboard,
   Clock,
@@ -15,6 +17,7 @@ import {
 
 export default function AdminSidebar() {
   const pathname = usePathname();
+  const { admin, isLoading, logout } = useAdminAuth();
 
   const navItems = [
     {
@@ -49,6 +52,9 @@ export default function AdminSidebar() {
       icon: Settings,
     },
   ];
+  const displayName = admin?.fullName ?? "Admin User";
+  const displayRole = formatRole(admin?.role);
+  const initials = getInitials(admin?.fullName);
 
   return (
     <aside className="flex h-screen w-64 flex-col justify-between bg-[#06321F] p-md text-white border-r border-emerald-950">
@@ -63,17 +69,29 @@ export default function AdminSidebar() {
 
         {/* User Card */}
         <div className="mb-lg flex items-center gap-xs rounded-xl bg-emerald-900/40 p-xs border border-emerald-800/50">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-700 font-mono text-body-xs font-bold text-white">
-            ZB
-          </div>
-          <div className="overflow-hidden">
-            <p className="truncate font-body text-body-xs font-bold text-white">
-              Zainab Babalola
-            </p>
-            <span className="inline-block rounded-md bg-emerald-800/80 px-xs py-[2px] font-body text-[10px] font-bold text-emerald-200">
-              Super Admin
-            </span>
-          </div>
+          {isLoading ? (
+            <>
+              <div className="h-9 w-9 shrink-0 animate-pulse rounded-full bg-emerald-800/60" />
+              <div className="flex-1 overflow-hidden">
+                <div className="h-3 w-24 animate-pulse rounded bg-emerald-800/60" />
+                <div className="mt-1.5 h-3 w-16 animate-pulse rounded bg-emerald-800/40" />
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-700 font-mono text-body-xs font-bold text-white">
+                {initials}
+              </div>
+              <div className="overflow-hidden">
+                <p className="truncate font-body text-body-xs font-bold text-white">
+                  {displayName}
+                </p>
+                <span className="inline-block rounded-md bg-emerald-800/80 px-xs py-[2px] font-body text-[10px] font-bold text-emerald-200">
+                  {displayRole}
+                </span>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Navigation Items */}
@@ -116,13 +134,14 @@ export default function AdminSidebar() {
 
       {/* Bottom Action */}
       <div className="pt-md border-t border-emerald-900/50">
-        <Link
-          href="/admin/login"
-          className="flex items-center gap-sm rounded-xl px-sm py-2.5 font-body text-body-xs font-bold text-emerald-200/70 hover:bg-emerald-900/40 hover:text-white transition-all"
+        <button
+          type="button"
+          onClick={logout}
+          className="flex w-full items-center gap-sm rounded-xl px-sm py-2.5 font-body text-body-xs font-bold text-emerald-200/70 transition-all hover:bg-emerald-900/40 hover:text-white"
         >
           <LogOut className="h-4 w-4 text-emerald-300/60" />
           <span>Sign Out</span>
-        </Link>
+        </button>
       </div>
     </aside>
   );

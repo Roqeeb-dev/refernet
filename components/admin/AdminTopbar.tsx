@@ -1,12 +1,17 @@
 "use client";
 
 import { Search, Bell } from "lucide-react";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
+import { getInitials } from "@/lib/admin-display";
 
 interface AdminTopbarProps {
   title?: string;
 }
 
 export default function AdminTopbar({ title = "Dashboard" }: AdminTopbarProps) {
+  const { admin, isLoading } = useAdminAuth();
+  const initials = getInitials(admin?.fullName);
+
   return (
     <header className="flex h-16 w-full items-center justify-between border-b border-gray-200/80 bg-white px-lg">
       {/* Page Title */}
@@ -36,9 +41,16 @@ export default function AdminTopbar({ title = "Dashboard" }: AdminTopbarProps) {
         </button>
 
         {/* User Initials Avatar */}
-        <div className="ml-xs flex h-10 w-10 items-center justify-center rounded-full bg-emerald-800 font-mono text-body-xs font-bold text-white shadow-2xs">
-          ZB
-        </div>
+        {isLoading ? (
+          <div className="ml-xs h-10 w-10 animate-pulse rounded-full bg-gray-200" />
+        ) : (
+          <div
+            className="ml-xs flex h-10 w-10 items-center justify-center rounded-full bg-emerald-800 font-mono text-body-xs font-bold text-white shadow-2xs"
+            title={admin?.fullName ?? "Admin User"}
+          >
+            {initials}
+          </div>
+        )}
       </div>
     </header>
   );
