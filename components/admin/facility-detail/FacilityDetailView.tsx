@@ -1,0 +1,128 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+import {
+  getFacilityById,
+  AdminFacility,
+} from "@/services/admin-facilities.service";
+import FacilityDetailHeader from "./FacilityDetailHeader";
+import FacilityDetailTabs, { FacilityTabKey } from "./FacilityDetailTabs";
+import FacilityManagementPanel from "./FacilityManagementPanel";
+import FacilityProfileTab from "./tabs/FacilityProfileTab";
+import FacilityDocumentsTab from "./tabs/FacilityDocumentsTab";
+import FacilityReferralActivityTab from "./tabs/FacilityReferralActivityTab";
+import FacilityDeclineHistoryTab from "./tabs/FacilityDeclineHistoryTab";
+import FacilityAdminNotesTab from "./tabs/FacilityAdminNotesTab";
+import FacilityAuditLogTab from "./tabs/FacilityAuditLogTab";
+import {
+  PageLoadingState,
+  PageErrorState,
+} from "@/components/admin/AdminPageStates";
+
+interface FacilityDetailViewProps {
+  facilityId: string;
+}
+
+export default function FacilityDetailView({
+  facilityId,
+}: FacilityDetailViewProps) {
+  const [facility, setFacility] = useState<AdminFacility | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<FacilityTabKey>("profile");
+
+  async function loadFacility() {
+    setIsLoading(true);
+    setErrorMsg(null);
+
+    const { facility: data, error } = await getFacilityById(facilityId);
+
+    if (error || !data) {
+      setErrorMsg(error ?? "Facility not found.");
+    } else {
+      setFacility(data);
+    }
+    setIsLoading(false);
+  }
+
+  useEffect(() => {
+    loadFacility();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [facilityId]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-slate-50/50 p-md">
+        <PageLoadingState message="Loading facility..." />
+      </div>
+    );
+  }
+
+  if (errorMsg || !facility) {
+    return (
+      <div className="min-h-screen bg-slate-50/50 p-md">
+        <PageErrorState
+          title="Failed to load facility"
+          errorMsg={errorMsg ?? "Unknown error."}
+          onRetry={loadFacility}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-50/50 p-md font-body">
+      <Link
+        href="/admin/facilities"
+        className="mb-sm inline-flex items-center gap-1.5 font-body text-body-sm font-medium text-text-secondary hover:text-text-primary"
+      >
+        <ArrowLeft className="h-3.5 w-3.5" />
+        All Facilities
+      </Link>
+
+      <div className="rounded-2xl border border-gray-100 bg-white p-lg shadow-xs">
+        <FacilityDetailHeader facility={facility} />
+
+        <FacilityDetailTabs activeTab={activeTab} onChange={setActiveTab} />
+
+        <div className="mt-lg grid grid-cols-1 gap-lg lg:grid-cols-[1fr_280px]">
+          {/* Active tab content — each tab component fetches its own
+              data lazily on mount, rather than the shell loading
+              every tab's data upfront. */}
+          <div>
+            {activeTab === "profile" && (
+              <FacilityProfileTab
+                facility={facility}
+                onFacilityUpdated={loadFacility}
+              />
+            )}
+            {activeTab === "documents" && (
+              <FacilityDocumentsTab facilityId={facility.id} />
+            )}
+            {activeTab === "referral-activity" && (
+              <FacilityReferralActivityTab facilityId={facility.id} />
+            )}
+            {activeTab === "decline-history" && (
+              <FacilityDeclineHistoryTab facilityId={facility.id} />
+            )}
+            {activeTab === "admin-notes" && (
+              <FacilityAdminNotesTab facilityId={facility.id} />
+            )}
+            {activeTab === "audit-log" && (
+              <FacilityAuditLogTab facilityId={facility.id} />
+            )}
+          </div>
+
+          {/* Management panel stays visible regardless of active tab,
+              matching the Figma layout. */}
+          <FacilityManagementPanel
+            facility={facility}
+            onStatusChanged={loadFacility}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}

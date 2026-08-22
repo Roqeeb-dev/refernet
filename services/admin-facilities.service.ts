@@ -101,6 +101,33 @@ export async function fetchPendingFacilities() {
   return fetchAllFacilities({ status: "pending_review" });
 }
 
+export async function getFacilityById(facilityId: string) {
+  try {
+    const { data, error } = await supabase
+      .from("facility_registrations")
+      .select(
+        "id, facility_name, facility_type, state, lga, status, created_at, phone_number",
+      )
+      .eq("id", facilityId)
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data) {
+      return { facility: null, error: "Facility not found." };
+    }
+
+    return {
+      facility: mapRow(data as FacilityRegistrationRow),
+      error: null,
+    };
+  } catch (err: any) {
+    return {
+      facility: null,
+      error: err.message || "Failed to load facility.",
+    };
+  }
+}
+
 export async function toggleFacilitySuspension(
   facilityId: string,
   currentStatus: FacilityStatus,

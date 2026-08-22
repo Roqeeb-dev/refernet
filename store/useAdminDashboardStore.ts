@@ -29,6 +29,7 @@ interface DashboardState {
   pendingCount: number;
   approvedThisMonthCount: number;
   rejectedThisMonthCount: number;
+  suspendedCount: number;
   totalRegisteredCount: number;
 
   // Data Sections
@@ -47,6 +48,7 @@ export const useDashboardStore = create<DashboardState>((set) => ({
   pendingCount: 0,
   approvedThisMonthCount: 0,
   rejectedThisMonthCount: 0,
+  suspendedCount: 0,
   totalRegisteredCount: 0,
 
   pendingQueue: [],
@@ -59,20 +61,23 @@ export const useDashboardStore = create<DashboardState>((set) => ({
       const data = (await adminFacilitiesService.fetchAllFacilities())
         .facilities;
 
-      // Compute live KPIs
       const pendingList = data.filter(
-        (f: AdminFacility) => f.status?.toLowerCase() === "pending",
+        (f: AdminFacility) => f.status === "pending_review",
       );
       const totalCount = data.length;
+
       const approvedCount = data.filter(
-        (f: AdminFacility) =>
-          f.status === "Active" || f.tier === "Tier 2 — Verified",
-      ).length;
-      const rejectedCount = data.filter(
-        (f: AdminFacility) => f.status === "Suspended",
+        (f: AdminFacility) => f.status === "approved",
       ).length;
 
-      // Mocked recent activity derived from real facilities or audit logs
+      const rejectedCount = data.filter(
+        (f: AdminFacility) => f.status === "rejected",
+      ).length;
+
+      const suspendedCount = data.filter(
+        (f: AdminFacility) => f.status === "suspended",
+      ).length;
+
       const computedActivities: RecentActivityItem[] = [
         {
           id: "act-1",
@@ -127,6 +132,7 @@ export const useDashboardStore = create<DashboardState>((set) => ({
         pendingCount: pendingList.length,
         approvedThisMonthCount: approvedCount,
         rejectedThisMonthCount: rejectedCount,
+        suspendedCount,
         totalRegisteredCount: totalCount,
         recentActivities: computedActivities,
         attentionItems: computedAttention,
