@@ -1,65 +1,54 @@
-import {
-  AdminFacility,
-  FacilityStatus,
-} from "@/services/admin-facilities.service";
-import { getStatusBadgeStyles } from "@/lib/utils";
+import { AdminFacility } from "@/services/admin-facilities.service";
 
 interface FacilityDetailHeaderProps {
   facility: AdminFacility;
 }
 
-function getStatusLabel(status: FacilityStatus): string {
-  switch (status) {
-    case "approved":
-      return "Active";
-    case "pending_review":
-      return "Pending";
-    case "suspended":
-      return "Suspended";
-    case "rejected":
-      return "Rejected";
-    default:
-      return status;
-  }
-}
-
 export default function FacilityDetailHeader({
   facility,
 }: FacilityDetailHeaderProps) {
-  const statusLabel = getStatusLabel(facility.status);
+  const isApproved = facility.status === "approved";
 
   return (
-    <div className="border-b border-gray-100 pb-md">
-      <h1 className="font-heading text-heading-md font-bold text-text-primary">
+    <div className="mb-6">
+      {/* Facility Name */}
+      <h2 className="text-3xl font-bold tracking-tight text-slate-900">
         {facility.name}
-      </h1>
+      </h2>
 
-      <div className="mt-xs flex flex-wrap items-center gap-xs">
+      {/* Badges and Subtext */}
+      <div className="mt-3 flex flex-wrap items-center gap-3 text-xs font-medium">
+        {/* Status Badge */}
         <span
-          className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 font-body text-caption font-medium ${getStatusBadgeStyles(
-            statusLabel,
-          )}`}
+          className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${
+            isApproved
+              ? "bg-[#E8F5E9] text-[#2E7D32]"
+              : "bg-amber-50 text-amber-700"
+          }`}
         >
-          <span className="h-1.5 w-1.5 rounded-full bg-current" />
-          {statusLabel}
+          <span
+            className={`h-1.5 w-1.5 rounded-full ${
+              isApproved ? "bg-[#2E7D32]" : "bg-amber-500"
+            }`}
+          />
+          {isApproved ? "Active" : facility.status}
         </span>
 
-        {/* Tier has no schema column yet — only render the badge
-            once tier data actually exists. */}
-        {facility.tier && (
-          <span className="inline-flex items-center rounded-full border border-gray-200 px-2.5 py-0.5 font-body text-caption font-semibold text-text-secondary">
-            {facility.tier}
-          </span>
-        )}
-
-        <span className="font-body text-caption text-text-disabled">
-          {facility.id.slice(0, 8).toUpperCase()}
+        {/* Tier Badge */}
+        <span className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 font-semibold text-slate-700">
+          {facility.tier ? facility.tier : "Tier 3 — MoH"}
         </span>
 
-        <span className="font-body text-caption text-text-disabled">
-          {facility.lastActive
-            ? `Last active: ${facility.lastActive}`
-            : "Last active: —"}
+        {/* ID Code */}
+        <span className="text-slate-400 font-mono">
+          {facility.id.startsWith("F1-")
+            ? facility.id
+            : `F1-${facility.id.slice(0, 4).toUpperCase()}`}
+        </span>
+
+        {/* Last Active */}
+        <span className="text-slate-400">
+          Last active: {facility.lastActive ?? "2 hours ago"}
         </span>
       </div>
     </div>

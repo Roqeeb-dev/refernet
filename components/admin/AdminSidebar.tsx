@@ -71,7 +71,6 @@ export default function AdminSidebar() {
       name: "Pending Approval",
       href: "/admin/pending",
       icon: Clock,
-      badge: 7,
     },
     {
       name: "All Facilities",
@@ -205,17 +204,6 @@ export default function AdminSidebar() {
                   />
                   {!collapsed && <span>{item.name}</span>}
                 </div>
-
-                {item.badge && !collapsed && (
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-red-500 font-mono text-[11px] font-extrabold text-white">
-                    {item.badge}
-                  </span>
-                )}
-
-                {/* Collapsed mode: show badge as a small dot instead of a number */}
-                {item.badge && collapsed && (
-                  <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-red-500 ring-2 ring-[#06321F]" />
-                )}
               </Link>
             );
           })}

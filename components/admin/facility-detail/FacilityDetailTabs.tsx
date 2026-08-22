@@ -30,7 +30,7 @@ export default function FacilityDetailTabs({
   onChange,
 }: FacilityDetailTabsProps) {
   return (
-    <div className="mt-md flex items-center gap-lg border-b border-gray-100 overflow-x-auto">
+    <div className="flex border-b border-slate-200 overflow-x-auto">
       {TABS.map((tab) => {
         const isActive = tab.key === activeTab;
         return (
@@ -38,13 +38,16 @@ export default function FacilityDetailTabs({
             key={tab.key}
             type="button"
             onClick={() => onChange(tab.key)}
-            className={`shrink-0 whitespace-nowrap border-b-2 py-sm font-body text-body-sm font-semibold transition-colors ${
+            className={`relative shrink-0 pb-3 pr-8 text-sm font-semibold transition-colors ${
               isActive
-                ? "border-emerald-700 text-emerald-800"
-                : "border-transparent text-text-secondary hover:text-text-primary"
+                ? "text-[#112A12]"
+                : "text-slate-500 hover:text-slate-800"
             }`}
           >
             {tab.label}
+            {isActive && (
+              <span className="absolute bottom-0 left-0 h-[2.5px] w-12 rounded-full bg-[#112A12]" />
+            )}
           </button>
         );
       })}
