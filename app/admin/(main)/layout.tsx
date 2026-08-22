@@ -29,7 +29,7 @@ export default function AdminLayout({
       <AdminSidebar />
       <div className="flex flex-1 flex-col overflow-hidden">
         <AdminTopbar />
-        <main className="flex-1 overflow-y-auto p-lg">{children}</main>
+        <main className="flex-1 overflow-y-auto p-md md:p-lg">{children}</main>
       </div>
     </div>
   );

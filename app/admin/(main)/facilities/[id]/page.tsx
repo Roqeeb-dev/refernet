@@ -1,7 +1,10 @@
-export default function FacilityDetailsPage() {
-  return (
-    <main>
-      <h1>This is the facility detail page</h1>
-    </main>
-  );
+import FacilityDetailView from "@/components/admin/facility-detail/FacilityDetailView";
+
+interface PageProps {
+  params: Promise<{ id: string }>;
+}
+
+export default async function FacilityDetailPage({ params }: PageProps) {
+  const { id } = await params;
+  return <FacilityDetailView facilityId={id} />;
 }

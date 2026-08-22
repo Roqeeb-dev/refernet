@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Button from "@/components/shared/Button";
@@ -35,24 +35,19 @@ export default function ReviewPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
 
-  const isMissingDraftData = !documentPath || !receivingFacility;
-
-  useEffect(() => {
-    if (isMissingDraftData) {
-      router.replace("/dashboard/new-referral/paper-bridge/upload");
-    }
-  }, [isMissingDraftData, router]);
-
-  if (isMissingDraftData || !receivingFacility || !documentPath) {
-    return null;
-  }
-
   const referenceNumber = getReferenceNumber(draftReferralId);
   const fileName = extractFileName(documentPath);
-  const statusOption = getFacilityAvailabilityOption(receivingFacility.status);
+  const statusOption = receivingFacility
+    ? getFacilityAvailabilityOption(receivingFacility.status)
+    : null;
 
-  async function handleSubmit() {
-    if (!receivingFacility || !documentPath) return;
+  const handleSubmit = async () => {
+    if (!receivingFacility || !documentPath) {
+      setSubmitError(
+        "Please complete the upload and facility selection first.",
+      );
+      return;
+    }
 
     setSubmitError("");
     setSubmitting(true);
@@ -71,21 +66,28 @@ export default function ReviewPage() {
       return;
     }
 
-    router.push(`/dashboard/new-referral/submitted?id=${referralId}`);
     reset();
-  }
+
+    // Redirect using the database UUID 'id' search parameter
+    router.push(`/dashboard/new-referral/submitted?id=${referralId}`);
+  };
 
   const facilityRows = [
-    { label: "Facility", value: receivingFacility.name },
-    { label: "Type", value: getFacilityTypeLabel(receivingFacility.type) },
-    { label: "Location", value: receivingFacility.address },
+    { label: "Facility", value: receivingFacility?.name ?? "" },
+    {
+      label: "Type",
+      value: receivingFacility
+        ? getFacilityTypeLabel(receivingFacility.type)
+        : "",
+    },
+    { label: "Location", value: receivingFacility?.address ?? "" },
     {
       label: "Distance",
-      value: receivingFacility.distanceKm
+      value: receivingFacility?.distanceKm
         ? `${receivingFacility.distanceKm} km`
         : "—",
     },
-    { label: "Status", value: statusOption.label },
+    { label: "Status", value: statusOption?.label ?? "" },
   ];
 
   return (

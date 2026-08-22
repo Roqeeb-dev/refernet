@@ -68,7 +68,13 @@ export function getTierBadgeStyles(tier: AdminFacility["tier"]) {
   }
 }
 
-export function getStatusBadgeStyles(status: AdminFacility["status"]) {
+export type FacilityStatusLabel =
+  | "Active"
+  | "Pending"
+  | "Suspended"
+  | "Rejected";
+
+export function getStatusBadgeStyles(status: FacilityStatusLabel | string) {
   switch (status) {
     case "Active":
       return "bg-emerald-100/70 text-emerald-800";
@@ -76,6 +82,8 @@ export function getStatusBadgeStyles(status: AdminFacility["status"]) {
       return "bg-blue-100/70 text-blue-700";
     case "Suspended":
       return "bg-red-100/70 text-red-700";
+    case "Rejected":
+      return "bg-gray-200/80 text-gray-700";
     default:
       return "bg-gray-100 text-gray-700";
   }

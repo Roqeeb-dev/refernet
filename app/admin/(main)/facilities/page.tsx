@@ -25,13 +25,12 @@ export default function FacilitiesPage() {
   } = useAdminFacilities();
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedTier, setSelectedTier] = useState("all");
   const [selectedType, setSelectedType] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
 
   const availableTypes = useMemo(() => {
     const types = new Set(facilities.map((f) => f.type).filter(Boolean));
-    return Array.from(types);
+    return Array.from(types) as string[];
   }, [facilities]);
 
   const filteredFacilities = useMemo(() => {
@@ -40,18 +39,17 @@ export default function FacilitiesPage() {
       const matchesSearch =
         !q ||
         f.name.toLowerCase().includes(q) ||
-        f.state.toLowerCase().includes(q) ||
-        f.lga.toLowerCase().includes(q) ||
+        (f.state ?? "").toLowerCase().includes(q) ||
+        (f.lga ?? "").toLowerCase().includes(q) ||
         (f.phone && f.phone.includes(q));
 
-      const matchesTier = selectedTier === "all" || f.tier === selectedTier;
       const matchesType = selectedType === "all" || f.type === selectedType;
       const matchesStatus =
         selectedStatus === "all" || f.status === selectedStatus;
 
-      return matchesSearch && matchesTier && matchesType && matchesStatus;
+      return matchesSearch && matchesType && matchesStatus;
     });
-  }, [facilities, searchQuery, selectedTier, selectedType, selectedStatus]);
+  }, [facilities, searchQuery, selectedType, selectedStatus]);
 
   return (
     <div className="min-h-screen bg-slate-50/50 p-md font-body">
@@ -106,17 +104,6 @@ export default function FacilitiesPage() {
 
           <div className="flex flex-wrap items-center gap-sm">
             <select
-              value={selectedTier}
-              onChange={(e) => setSelectedTier(e.target.value)}
-              className="h-9 rounded-xl border border-gray-200 bg-white px-sm text-[11px] font-medium text-text-primary outline-none focus:border-emerald-600"
-            >
-              <option value="all">All Tiers</option>
-              <option value="Tier 1">Tier 1</option>
-              <option value="Tier 2 — Verified">Tier 2 — Verified</option>
-              <option value="Tier 3 — MoH">Tier 3 — MoH</option>
-            </select>
-
-            <select
               value={selectedType}
               onChange={(e) => setSelectedType(e.target.value)}
               className="h-9 rounded-xl border border-gray-200 bg-white px-sm text-[11px] font-medium text-text-primary outline-none focus:border-emerald-600"
@@ -135,9 +122,10 @@ export default function FacilitiesPage() {
               className="h-9 rounded-xl border border-gray-200 bg-white px-sm text-[11px] font-medium text-text-primary outline-none focus:border-emerald-600"
             >
               <option value="all">All Statuses</option>
-              <option value="Active">Active</option>
-              <option value="Pending">Pending</option>
-              <option value="Suspended">Suspended</option>
+              <option value="approved">Active</option>
+              <option value="pending_review">Pending</option>
+              <option value="suspended">Suspended</option>
+              <option value="rejected">Rejected</option>
             </select>
           </div>
         </div>
@@ -168,11 +156,8 @@ export default function FacilitiesPage() {
                   <th className="py-2xs px-sm">FACILITY NAME</th>
                   <th className="py-2xs px-sm">TYPE</th>
                   <th className="py-2xs px-sm">STATE / LGA</th>
-                  <th className="py-2xs px-sm">TIER</th>
                   <th className="py-2xs px-sm">REGISTERED</th>
                   <th className="py-2xs px-sm">STATUS</th>
-                  <th className="py-2xs px-sm">LAST ACTIVE</th>
-                  <th className="py-2xs px-sm">DECLINE RATE</th>
                   <th className="py-2xs px-sm text-center">ACTIONS</th>
                 </tr>
               </thead>

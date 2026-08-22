@@ -82,7 +82,7 @@ export default function DashboardPage() {
       )}
 
       {/* Dynamic Statistics Grid */}
-      <div className="grid gap-base sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-base grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
           <StatCard key={stat.label} {...stat} />
         ))}
