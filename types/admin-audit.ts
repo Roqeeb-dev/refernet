@@ -37,6 +37,7 @@ export interface LogActionParams {
 export interface AuditLogFilters {
   adminId?: string;
   action?: string;
+  facilityId?: string;
   facilityQuery?: string;
   startDate?: string;
   endDate?: string;

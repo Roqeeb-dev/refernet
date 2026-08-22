@@ -76,8 +76,20 @@ export async function getAuditLogs(
       query = query.eq("action", filters.action);
     }
 
+    if (filters?.facilityId) {
+      query = query.eq("facility_id", filters.facilityId);
+    }
+
     if (filters?.facilityQuery) {
       query = query.ilike("facility_name", `%${filters.facilityQuery}%`);
+    }
+
+    if (filters?.startDate) {
+      query = query.gte("created_at", filters.startDate);
+    }
+
+    if (filters?.endDate) {
+      query = query.lte("created_at", filters.endDate);
     }
 
     const { data, error } = await query;
